@@ -1,0 +1,6 @@
+# MacOS drops these everywhere
+.DS_Store
+
+# IntelliJ IDEA is my editor of choice
+.idea
+*.iml
