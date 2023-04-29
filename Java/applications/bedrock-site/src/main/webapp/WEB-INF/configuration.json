@@ -1,0 +1,60 @@
+{
+    "log-file": "/usr/local/tomcat/logs/catalina.out",
+    "schema": {
+        "name": "Bedrock Service",
+        "description": "Bedrock Service is a simple example designed to demonstrate use of the Bedrock Microservice Architecture and API.",
+        "events": {
+            "ok": {
+                "description": "Return an empty response, with status Ok.",
+                "strict": false,
+                "example": {}
+            },
+            "lock": {
+                "description": "Lock the server.",
+                "strict": true,
+                "parameters": {
+                    "secret": { "description": "The secret used to verify the lock", "required":  true }
+                },
+                "example": { "secret": "xxxx1234" }
+            },
+            "ip-address": {
+                "description": "Return the IP address of the requestor.",
+                "response": {
+                    "ip": { "description": "IP (v4) address of the requestor.", "required": true }
+                },
+                "example": {}
+            },
+            "headers": {
+                "description": "Return the HTTP request headers.",
+                "response": {
+                    "host": { "description":"Name of the host the request is to." },
+                    "user-agent": { "description":"Browser user agent." }
+                },
+                "example": {}
+            },
+            "log-file": {
+                "description": "Return the server's log file contents.",
+                "strict": true,
+                "parameters": {
+                    "line-count": { "description": "The number of lines from the log file to return (default is 100)", "required":  false }
+                },
+                "response": [],
+                "example": { "line-count":  200 }
+            }
+        }
+    },
+    "event-filter": {
+        "filter-type": "any-list",
+        "any-list": [
+            {
+                "event-list": [ "lock" ],
+                "filter-type": "secret-list",
+                "secret-list": [ { "salt": "", "hash": "", "recipe": "SHA-512" } ]
+            },
+            {
+                "event-list": [ "*" ],
+                "filter-type": "allow"
+            }
+        ]
+    }
+}
