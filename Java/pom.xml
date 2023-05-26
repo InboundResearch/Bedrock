@@ -29,7 +29,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mongodb.version>4.9.1</mongodb.version>
         <junit-jupiter.version>5.9.3</junit-jupiter.version>
-        <tomcat.version>9.0.74</tomcat.version>
+        <tomcat.version>10.1.9</tomcat.version>
         <java.version>14</java.version>
     </properties>
 
@@ -54,6 +54,7 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
@@ -89,6 +90,7 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>3.0.1</version>
                 <executions>

@@ -1,8 +1,8 @@
 package us.irdev.bedrock.servlet.test;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,16 +41,6 @@ public class TestResponse implements HttpServletResponse {
 
     @Override
     public String encodeRedirectURL (String s) {
-        return null;
-    }
-
-    @Override
-    public String encodeUrl (String s) {
-        return null;
-    }
-
-    @Override
-    public String encodeRedirectUrl (String s) {
         return null;
     }
 
@@ -101,11 +91,6 @@ public class TestResponse implements HttpServletResponse {
 
     @Override
     public void setStatus (int i) {
-
-    }
-
-    @Override
-    public void setStatus (int i, String s) {
 
     }
 

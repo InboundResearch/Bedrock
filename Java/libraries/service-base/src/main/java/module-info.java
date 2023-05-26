@@ -1,5 +1,5 @@
 module us.irdev.bedrock.service {
-    requires java.servlet;
+    requires jakarta.servlet;
     requires org.apache.commons.io;
     requires us.irdev.bedrock.bag;
     requires us.irdev.bedrock.secret;

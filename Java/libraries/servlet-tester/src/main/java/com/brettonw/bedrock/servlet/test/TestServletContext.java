@@ -3,8 +3,8 @@ package us.irdev.bedrock.servlet.test;
 import us.irdev.bedrock.logger.*;
 
 
-import javax.servlet.*;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.*;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -90,27 +90,7 @@ public class TestServletContext implements ServletContext {
     }
 
     @Override
-    public Servlet getServlet (String s) throws ServletException {
-        return null;
-    }
-
-    @Override
-    public Enumeration<Servlet> getServlets () {
-        return null;
-    }
-
-    @Override
-    public Enumeration<String> getServletNames () {
-        return null;
-    }
-
-    @Override
     public void log (String s) {
-
-    }
-
-    @Override
-    public void log (Exception e, String s) {
 
     }
 

@@ -5,8 +5,8 @@ import us.irdev.bedrock.bag.formats.MimeType;
 import us.irdev.bedrock.logger.*;
 
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -94,6 +94,11 @@ public class TestRequest implements HttpServletRequest {
     }
 
     @Override
+    public HttpServletMapping getHttpServletMapping () {
+        return HttpServletRequest.super.getHttpServletMapping ();
+    }
+
+    @Override
     public String getMethod () {
         return null;
     }
@@ -106,6 +111,11 @@ public class TestRequest implements HttpServletRequest {
     @Override
     public String getPathTranslated () {
         return null;
+    }
+
+    @Override
+    public PushBuilder newPushBuilder () {
+        return HttpServletRequest.super.newPushBuilder ();
     }
 
     @Override
@@ -184,11 +194,6 @@ public class TestRequest implements HttpServletRequest {
     }
 
     @Override
-    public boolean isRequestedSessionIdFromUrl () {
-        return false;
-    }
-
-    @Override
     public boolean authenticate (HttpServletResponse httpServletResponse) throws IOException, ServletException {
         return false;
     }
@@ -216,6 +221,16 @@ public class TestRequest implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade (Class<T> aClass) throws IOException, ServletException {
         return null;
+    }
+
+    @Override
+    public Map<String, String> getTrailerFields () {
+        return HttpServletRequest.super.getTrailerFields ();
+    }
+
+    @Override
+    public boolean isTrailerFieldsReady () {
+        return HttpServletRequest.super.isTrailerFieldsReady ();
     }
 
     @Override
@@ -349,11 +364,6 @@ public class TestRequest implements HttpServletRequest {
     }
 
     @Override
-    public String getRealPath (String s) {
-        return null;
-    }
-
-    @Override
     public int getRemotePort () {
         return 0;
     }
@@ -405,6 +415,21 @@ public class TestRequest implements HttpServletRequest {
 
     @Override
     public DispatcherType getDispatcherType () {
+        return null;
+    }
+
+    @Override
+    public String getRequestId () {
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId () {
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection () {
         return null;
     }
 }

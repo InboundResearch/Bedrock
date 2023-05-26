@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-public class SourceAdapterHttp extends SourceAdapter {
+public class SourceAdapterHttp extends us.irdev.bedrock.bag.SourceAdapter {
     private static final Logger log = LogManager.getLogger (SourceAdapterHttp.class);
 
     private static final String UTF_8 = StandardCharsets.UTF_8.name ();

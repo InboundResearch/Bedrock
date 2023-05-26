@@ -1,7 +1,7 @@
 package us.irdev.bedrock.servlet.test;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 import java.util.Enumeration;
 
 public class TestServletConfig implements ServletConfig {
