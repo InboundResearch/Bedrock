@@ -202,7 +202,7 @@ public class MongoDatabase_Test {
 
     @Test
     public void testConnectWithInvalidAddressFails () {
-        Map<String, MongoDatabase> collections = MongoDatabase.connect ("mongodb://bongo", "bongo", "bongo");
+        Map<String, MongoDatabase> collections = MongoDatabase.connect ("mongodb://bongo/?serverSelectionTimeoutMS=1000", "bongo", "bongo");
         assertEquals (null, collections);
     }
 

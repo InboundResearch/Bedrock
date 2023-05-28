@@ -22,7 +22,7 @@ public class MongoDatabase implements Interface, AutoCloseable {
     private static final Logger log = LogManager.getLogger (MongoDatabase.class);
 
     private static final String UNDERSCORE_ID = "_id";
-    private static final String LOCALHOST_DEFAULT = "mongodb://localhost:27017";
+    private static final String LOCALHOST_DEFAULT = "mongodb://localhost:27017/?connectTimeoutMS=3000";
 
     public static final String CONNECTION_STRING = "connection-string";
     public static final String DATABASE_NAME = "database-name";

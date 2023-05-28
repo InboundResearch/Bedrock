@@ -30,7 +30,7 @@
         <mongodb.version>4.9.1</mongodb.version>
         <junit-jupiter.version>5.9.3</junit-jupiter.version>
         <tomcat.version>10.1.9</tomcat.version>
-        <java.version>14</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <scm>

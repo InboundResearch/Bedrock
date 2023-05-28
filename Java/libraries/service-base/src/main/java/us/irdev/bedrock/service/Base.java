@@ -5,7 +5,6 @@ import us.irdev.bedrock.bag.formats.MimeType;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import us.irdev.bedrock.logger.*;
 
-
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -13,9 +12,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,9 +103,9 @@ public class Base extends HttpServlet {
         // otherwise, check to see if the servlet has been initialized
         if (context != null) {
             // try to load the configuration from the specified file resource
-            var configurationPath = getContext ().getRealPath (configurationResourcePath);
+            var configurationPath = context.getRealPath (configurationResourcePath);
             log.info ("configuration path: " + configurationPath);
-            configuration = BagObjectFrom.inputStream (getContext ().getResourceAsStream (configurationResourcePath), BagObject::new);
+            configuration = BagObjectFrom.inputStream (context.getResourceAsStream (configurationResourcePath), BagObject::new);
 
             // common values for building the schema
             var help = Key.cat (EVENTS, HELP);
@@ -325,8 +326,8 @@ public class Base extends HttpServlet {
         var event = new Event (query, request);
         if (! locked) {
             if (schema != null) {
-                // create the event object around the request parameters, and validate that it is
-                // a known event
+                // create the event object around the request parameters, and validate it is a known
+                // event
                 var eventName = event.getEventName ();
                 if (eventName != null) {
                     var eventSpecification = schema.getBagObject (Key.cat (EVENTS, eventName));
@@ -418,30 +419,59 @@ public class Base extends HttpServlet {
     public void handleEventLogFile (Event event) throws IOException {
         var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
         var result = new BagArray(nLines);
-        var logFile = configuration.getString(LOG_FILE, () -> context.getRealPath("/").replace("webapps/bedrock/", "logs/catalina.out"));
-        var reader = new ReversedLinesFileReader(new File(logFile), UTF_8);
-        for (int counter = 0; counter < nLines; ++counter) {
-            var line = reader.readLine();
-            if (line != null) {
-                // log 1234567890123 I us.irdev.bedrock.class (method) message",
-                var array = line.split(" ", 6);
-                if ((array.length == 6) && (array[0].equals("log"))) {
-                    var method = String.join (".", array[3], array[4]).trim ();
-                    result.add(BagObject
-                            .open(TIMESTAMP, array[1])
-                            .put(LEVEL, array[2])
-                            .put(METHOD, method)
-                            .put(MESSAGE, escapeLine (array[5]))
-                    );
+        var logFile = configuration.getString(LOG_FILE, () -> {
+            // if the logfile path was not supplied in the configuration, we look in the "normal"
+            // places for it
 
-                    // stop after the servlet initialization...
-                    if (method.equals ("us.irdev.bedrock.service.Base.init")) {
-                        counter = nLines;
+            // build a file object representing the logs dir where we hope to find it
+            var logPath = context.getRealPath(File.separator).replaceFirst("webapps.*", "logs");
+            var directory = new File(logPath);
+
+            // create a FilenameFilter to filter files starting with the prefix "catalina"
+            FilenameFilter filter = (dir, name) -> name.startsWith("catalina");
+
+            // get a list of files matching the filter and check that we succeeded
+            File[] files = directory.listFiles(filter);
+            if ((files != null) && (files.length > 0)) {
+                // sort the files so the first one is the most recent
+                Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+                return files[0].getAbsolutePath();
+            }
+
+            // we failed, return null
+            return null;
+        });
+
+        // check if we succeeded
+        if (logFile != null) {
+            try (var reader = new ReversedLinesFileReader(new File(logFile), UTF_8)) {
+                for (int counter = 0; counter < nLines; ++counter) {
+                    var line = reader.readLine();
+                    if (line != null) {
+                        // log 1234567890123 I us.irdev.bedrock.class (method) message",
+                        var array = line.split(" ", 6);
+                        if ((array.length == 6) && (array[0].equals("log"))) {
+                            var method = String.join(".", array[3], array[4]).trim();
+                            result.add(BagObject
+                                    .open(TIMESTAMP, array[1])
+                                    .put(LEVEL, array[2])
+                                    .put(METHOD, method)
+                                    .put(MESSAGE, escapeLine(array[5]))
+                            );
+
+                            // stop after the servlet initialization...
+                            if (method.equals("us.irdev.bedrock.service.Base.init")) {
+                                counter = nLines;
+                            }
+                        }
                     }
                 }
+                event.ok(result);
             }
+            // let the parent handler deal with an exception
+        } else {
+            event.error ("Could not find log file.");
         }
-        event.ok (result);
     }
 
     public void handleEventMultiple (Event event) {

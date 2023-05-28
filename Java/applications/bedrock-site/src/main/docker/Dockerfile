@@ -1,4 +1,4 @@
-FROM tomcat:9.0.56-jdk11-openjdk-slim
+FROM tomcat:10.1.9-jre17
 
 # copy my war file
 COPY ROOT.war /usr/local/tomcat/webapps/
