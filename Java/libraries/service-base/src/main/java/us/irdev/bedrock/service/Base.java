@@ -418,7 +418,7 @@ public class Base extends HttpServlet {
     public void handleEventLogFile (Event event) throws IOException {
         var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
         var result = new BagArray(nLines);
-        var logFile = configuration.getString(LOG_FILE, () -> context.getRealPath("/") + "../logs/catalina.out");
+        var logFile = configuration.getString(LOG_FILE, () -> context.getRealPath("/").replace("webapps/bedrock/", "logs/catalina.out"));
         var reader = new ReversedLinesFileReader(new File(logFile), UTF_8);
         for (int counter = 0; counter < nLines; ++counter) {
             var line = reader.readLine();
