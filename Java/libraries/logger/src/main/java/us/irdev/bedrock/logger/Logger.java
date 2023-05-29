@@ -3,7 +3,6 @@ package us.irdev.bedrock.logger;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class Logger {
     public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -11,7 +10,7 @@ public class Logger {
     private final String name;
     private Level level;
     private String configuration;
-    private PrintStream out;
+    private final PrintStream out;
     private Date date;
 
     public Logger (String name, Level level, String configuration, PrintStream out) {
@@ -34,16 +33,10 @@ public class Logger {
     private Logger logInternal (Level logLevel, String message) {
         if (logLevel.getLevel() >= level.getLevel()) {
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-            /*
-            for (int i = 0; i < stackTrace.length; ++i) {
-                System.out.format("%d: %s:%s (%d)\n", i, stackTrace[i].getClassName(), stackTrace[i].getMethodName(), stackTrace[i].getLineNumber());
-            }
-            */
             StackTraceElement caller = stackTrace[3];
-            String[] callerClassName = caller.getClassName().split("\\.");
             // TODO add some formatting from 'configuration', with the level and all that jazz
             date = new Date ();
-            out.format("%s [%s] (%s:%s) %s%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date), logLevel.getName(), callerClassName[callerClassName.length - 1], caller.getMethodName(), message, System.lineSeparator());
+            out.format("%s [%s] (%s:%s) %s%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date), logLevel.getName(), caller.getClassName(), caller.getMethodName(), message, System.lineSeparator());
         }
         return this;
     }

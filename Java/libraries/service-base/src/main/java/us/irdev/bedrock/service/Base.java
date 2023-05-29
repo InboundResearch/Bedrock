@@ -12,13 +12,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
@@ -113,7 +112,7 @@ public class Base extends HttpServlet {
 
             // try to fetch the schema
             if ((schema = configuration.getBagObject (SCHEMA)) != null) {
-                // remove the schema object from the configuration so it is protected
+                // remove the schema object from the configuration, so it is protected
                 configuration.remove (SCHEMA);
 
                 // add the default events
@@ -143,7 +142,7 @@ public class Base extends HttpServlet {
                 schema.put (help, BagObjectFrom.resource (getClass (), "/help.json"));
                 schema.put (version, BagObjectFrom.resource (getClass (), "/version.json"));
 
-                // bootstrap/autowire... loop over all of the methods that match the target signature
+                // bootstrap/autowire... loop over all the methods that match the target signature
                 // and install them as bootstraped generics
                 var methods = this.getClass ().getMethods ();
                 for (var method : methods) {
@@ -154,7 +153,7 @@ public class Base extends HttpServlet {
                         var eventName = Arrays.stream (elements).map (String::toLowerCase).collect(joining("-"));
                         install (eventName);
 
-                        // add a default schema entry if one isn't in the bootstrap so it passes
+                        // add a default schema entry if one isn't in the bootstrap, so it passes
                         // basic validation
                         var schemaName = Key.cat (EVENTS, eventName);
                         if (!schema.has (schemaName)) {
@@ -291,7 +290,7 @@ public class Base extends HttpServlet {
         out.close ();
     }
 
-    private Event errorOnRequest (String errorString, HttpServletRequest request) throws IOException {
+    private Event errorOnRequest (String errorString, HttpServletRequest request) {
         var query = BagObjectFrom.string (request.getQueryString (), MimeType.URL, BagObject::new);
         return new Event (query, request).error(errorString);
     }
@@ -309,7 +308,7 @@ public class Base extends HttpServlet {
             }
         }
 
-        // loop over the parameter specification to be sure all of the required ones are present
+        // loop over the parameter specification to be sure all the required ones are present
         if (parameterSpecification != null) {
             var expectedParameters = parameterSpecification.keys ();
             for (var expectedParameter : expectedParameters) {
@@ -416,62 +415,45 @@ public class Base extends HttpServlet {
                 .replace ("\"", "\\\"");
     }
 
+    private String unbox(String input) {
+        var pattern = Pattern.compile("^[\\[(]([^])]+)");
+        var matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return input;
+    }
+
     public void handleEventLogFile (Event event) throws IOException {
-        var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
-        var result = new BagArray(nLines);
-        var logFile = configuration.getString(LOG_FILE, () -> {
-            // if the logfile path was not supplied in the configuration, we look in the "normal"
-            // places for it
+        var logFile = configuration.getString(LOG_FILE, () -> context.getRealPath(File.separator).replaceFirst("webapps.*", "logs/catalina.out"));
+        try (var reader = new ReversedLinesFileReader(new File(logFile), UTF_8)) {
+            var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
+            var result = new BagArray(nLines);
+            var end = Base.class.getCanonicalName() + ":init";
+            for (int counter = 0; counter < nLines; ++counter) {
+                var line = reader.readLine();
+                if (line != null) {
+                    // log 1234567890123 I us.irdev.bedrock.class (method) message",
+                    var array = line.split(" ", 5);
+                    var method = unbox(array[3]);
+                    if (array.length == 5) {
+                        result.add(BagObject
+                                .open(TIMESTAMP, array[0] + " " + array[1])
+                                .put(LEVEL, unbox(array[2]))
+                                .put(METHOD,  method)
+                                .put(MESSAGE, escapeLine(array[4]))
+                        );
 
-            // build a file object representing the logs dir where we hope to find it
-            var logPath = context.getRealPath(File.separator).replaceFirst("webapps.*", "logs");
-            var directory = new File(logPath);
-
-            // create a FilenameFilter to filter files starting with the prefix "catalina"
-            FilenameFilter filter = (dir, name) -> name.startsWith("catalina");
-
-            // get a list of files matching the filter and check that we succeeded
-            File[] files = directory.listFiles(filter);
-            if ((files != null) && (files.length > 0)) {
-                // sort the files so the first one is the most recent
-                Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
-                return files[0].getAbsolutePath();
-            }
-
-            // we failed, return null
-            return null;
-        });
-
-        // check if we succeeded
-        if (logFile != null) {
-            try (var reader = new ReversedLinesFileReader(new File(logFile), UTF_8)) {
-                for (int counter = 0; counter < nLines; ++counter) {
-                    var line = reader.readLine();
-                    if (line != null) {
-                        // log 1234567890123 I us.irdev.bedrock.class (method) message",
-                        var array = line.split(" ", 6);
-                        if ((array.length == 6) && (array[0].equals("log"))) {
-                            var method = String.join(".", array[3], array[4]).trim();
-                            result.add(BagObject
-                                    .open(TIMESTAMP, array[1])
-                                    .put(LEVEL, array[2])
-                                    .put(METHOD, method)
-                                    .put(MESSAGE, escapeLine(array[5]))
-                            );
-
-                            // stop after the servlet initialization...
-                            if (method.equals("us.irdev.bedrock.service.Base.init")) {
-                                counter = nLines;
-                            }
+                        // stop after the servlet initialization...
+                        if (method.equals(end)) {
+                            break;
                         }
                     }
                 }
-                event.ok(result);
             }
-            // let the parent handler deal with an exception
-        } else {
-            event.error ("Could not find log file.");
+            event.ok(result);
         }
+        // let the parent handler deal with an exception
     }
 
     public void handleEventMultiple (Event event) {

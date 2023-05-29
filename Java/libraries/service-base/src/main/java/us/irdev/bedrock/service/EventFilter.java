@@ -2,7 +2,6 @@ package us.irdev.bedrock.service;
 
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
-import us.irdev.bedrock.bag.Key;
 import us.irdev.bedrock.secret.Secret;
 import us.irdev.bedrock.logger.*;
 
@@ -118,12 +117,12 @@ public class EventFilter implements EventFilterHandler {
                 if (allItem != null) {
                     var eventFilterResult = filterEvent (event, allItem);
                     if (eventFilterResult != EventFilterResult.ALLOW) {
-                        // one of the child filters didn't match, we can early out on that
+                        // one of the child filters didn't match, we can exit early on that
                         return EventFilterResult.DENY;
                     }
                 }
             }
-            // all of the child filters matched and allow
+            // all the child filters matched and allow
             return EventFilterResult.ALLOW;
         }
         // no filters were specified

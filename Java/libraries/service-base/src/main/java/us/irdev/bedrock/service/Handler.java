@@ -11,9 +11,9 @@ public class Handler {
 
     public static final String HANDLER_PREFIX = "handleEvent";
 
-    private Object container;
-    private Method method;
-    private String eventName;
+    private final Object container;
+    private final Method method;
+    private final String eventName;
 
     public Handler (String eventName, Object container) throws NoSuchMethodException {
         this.container = container;
@@ -43,7 +43,7 @@ public class Handler {
             // this will never happen. the handler installation fails if the method is not public,
             // so it will never be installed if this would happen, and therefore never have the
             // opportunity to throw this exception. it is included here because the code won't
-            // compile withut it.
+            // compile without it.
             // event.error (exception.toString ());
         } catch (InvocationTargetException exception) {
             var cause = exception.getCause ();
