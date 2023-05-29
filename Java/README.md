@@ -97,5 +97,7 @@ export CATALINA_OPTS="$CATALINA_OPTS -agentlib:jdwp=transport=dt_socket,server=y
 ```
  Then configure IntelliJ IDEA with a debug configuration referencing a remote tomcat server. In the Startup/Connection tab, set the Transport to "Socket" and the Port to 18000 (as configured in the tomcat env above).
 
+<img src="img/IntelliJ-Remote-Debug-Tomcat.png" width="50%">
+
 ### Docker
 Launch the docker desktop application and update the settings to start automatically on login.
