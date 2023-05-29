@@ -24,24 +24,9 @@ public class Service extends Base {
         var headerNames = request.getHeaderNames ();
         while (headerNames.hasMoreElements ()) {
             var headerName = (String) headerNames.nextElement ();
-            var headerValue = request.getHeader (headerName);
+            var headerValue = escapeLine(request.getHeader (headerName));
             responseBagObject.put (headerName, headerValue);
         }
         event.ok (responseBagObject);
-    }
-
-    private String unescapeUrl (String urlString) {
-        var pattern = Pattern.compile ("[^\\\\]%[0-9a-fA-F]{2}");
-        var matcher = pattern.matcher (urlString);
-        var sb = new StringBuffer (urlString.length ());
-        while (matcher.find ()) {
-            var group = matcher.group ();
-            var hexVal = matcher.group ().substring (2);
-            var intVal = Integer.parseInt (hexVal, 16);
-            var s = group.substring (0, 1) + (char) intVal;
-            matcher.appendReplacement (sb, s);
-        }
-        matcher.appendTail (sb);
-        return sb.toString ();
     }
 }

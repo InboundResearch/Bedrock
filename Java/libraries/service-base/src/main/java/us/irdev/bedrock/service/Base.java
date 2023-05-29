@@ -404,7 +404,7 @@ public class Base extends HttpServlet {
         );
     }
 
-    private String escapeLine (String line) {
+    protected String escapeLine (String line) {
         return line
                 .replace ("\\", "\\\\")
                 .replace ("\n", "\\n")
@@ -415,7 +415,7 @@ public class Base extends HttpServlet {
                 .replace ("\"", "\\\"");
     }
 
-    private String unbox(String input) {
+    protected String unbox(String input) {
         var pattern = Pattern.compile("^[\\[(]([^])]+)");
         var matcher = pattern.matcher(input);
         if (matcher.find()) {
