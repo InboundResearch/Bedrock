@@ -88,5 +88,14 @@ Once this is done, you can track the log using tail:
 tail -f $HOMEBREW_PREFIX/opt/tomcat/libexec/logs/catalina.out
 ```
 
+#### Live Debugging In Tomcat With IntelliJ
+Configure the tomcat server with the debugger portal open by placing a `setenv.sh` file in the tomcat bin directory (`$HOMEBREW_PREFIX/opt/tomcat/libexec/bin`), with the following code:
+
+```
+#! /usr/bin/env bash
+export CATALINA_OPTS="$CATALINA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=18000"
+```
+ Then configure IntelliJ IDEA with a debug configuration referencing a remote tomcat server. In the Startup/Connection tab, set the Transport to "Socket" and the Port to 18000 (as configured in the tomcat env above).
+
 ### Docker
 Launch the docker desktop application and update the settings to start automatically on login.
