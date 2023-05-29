@@ -1,5 +1,5 @@
 # Bedrock 2
-Bedrock is a foundation for rapidly building microservices with client interactions. Version 2 is a re-architecture that moves all parameters into the POST data for security.
+Bedrock is a foundation for rapidly building microservices using JSON for client interactions. All parameters are passed in the message body using POST for security.
 
 ## Requirements
 * mongodb
@@ -87,3 +87,6 @@ Once this is done, you can track the log using tail:
 ```
 tail -f $HOMEBREW_PREFIX/opt/tomcat/libexec/logs/catalina.out
 ```
+
+### Docker
+Launch the docker desktop application and update the settings to start automatically on login.
