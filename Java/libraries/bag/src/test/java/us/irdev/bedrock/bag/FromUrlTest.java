@@ -7,14 +7,9 @@ import java.io.IOException;
 
 public class FromUrlTest {
     @Test
-    public void test () {
-
-    }
-
-    @Test
     public void testGet () throws IOException {
-        BagObject brettonw = BagObjectFrom.url ("https://bedrock.brettonw.com/api?event=ip-address", () -> null);
-        BagTest.report (brettonw.getString ("response/ip-address") != null, true, "Got a valid BagObject");
+        BagObject ipAddress = BagObjectFrom.url ("https://bedrock.brettonw.com/api?event=ip-address", () -> null);
+        BagTest.report (ipAddress.getString ("response/ip-address") != null, true, "Got a valid BagObject");
 
         // XXX should add an array processor to the test API for when github throttles the API
         BagArray arrayEcho = BagArrayFrom.url ("https://bedrock.brettonw.com/api?event=echo-array", () -> null);
