@@ -95,9 +95,14 @@ Configure the tomcat server with the debugger portal open by placing a `setenv.s
 #! /usr/bin/env bash
 export CATALINA_OPTS="$CATALINA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=18000"
 ```
- Then configure IntelliJ IDEA with a debug configuration referencing a remote tomcat server. In the Startup/Connection tab, set the Transport to "Socket" and the Port to 18000 (as configured in the tomcat env above).
+ Then configure IntelliJ IDEA with a debug configuration referencing a remote tomcat server. The configuration is probably already correct once you create it, but you will need to update the following values:
 
-<img src="img/IntelliJ-Remote-Debug-Tomcat.png" width="50%">
+ - In the Server tab, set the Server to your installation ($HOMEBREW_PREFIX/opt/tomcat/libexec), and if you want to launch a browser automatically, set the url to "http://localhost:8080/bedrock".
+
+ - In the Startup/Connection tab, set the Transport to "Socket" and the Port to 18000 (as configured in the tomcat env above).
+
+<img src="img/IntelliJ-Remote-Debug-Tomcat-A.png" width="40%">
+<img src="img/IntelliJ-Remote-Debug-Tomcat-B.png" width="40%">
 
 ### Docker
 Launch the docker desktop application and update the settings to start automatically on login.
