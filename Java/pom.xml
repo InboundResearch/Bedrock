@@ -33,9 +33,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git@github.com:brettonw/Bedrock2.git</connection>
-        <developerConnection>scm:git:git@github.com:brettonw/Bedrock2.git</developerConnection>
-        <url>https://github.com/brettonw/Bedrock2.git</url>
+        <connection>scm:git:git@github.com:InboundResearch/Bedrock.git</connection>
+        <developerConnection>scm:git:git@github.com:InboundResearch/Bedrock.git</developerConnection>
+        <url>https://github.com/InboundResearch/Bedrock.git</url>
     </scm>
 
     <distributionManagement>
