@@ -135,7 +135,7 @@ public class BagObjectFrom {
         return fail.get ();
     }
 
-    // from a HTTP connection (post)
+    // from an HTTP connection (post)
     static public BagObject url (String urlString, Bag postData, String postDataMimeType) {
         return url (urlString, postData, postDataMimeType, () -> null);
     }
