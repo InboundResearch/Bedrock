@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class Test_Tester extends HttpServlet {
     private static final Logger log = LogManager.getLogger (Test_Tester.class);
@@ -35,19 +35,6 @@ public class Test_Tester extends HttpServlet {
 
     public Test_Tester () {
         servletTester = new Tester (this);
-    }
-
-    @Override
-    protected void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug ("doGet");
-
-        BagObject query = BagObjectFrom.string (request.getQueryString (), MimeType.URL);
-        BagObject responseObject = new BagObject (query).put (IP_KEY, request.getRemoteAddr ());
-        if (query.getString (COMMAND_KEY).equals (TEST_KEY)) {
-            makeResponse (response, responseObject.put (STATUS_KEY, OK_KEY).toString ());
-        } else {
-            makeResponse (response, responseObject.put (STATUS_KEY, ERROR_KEY).toString ());
-        }
     }
 
     @Override
@@ -80,24 +67,14 @@ public class Test_Tester extends HttpServlet {
     }
 
     private void doGetAssert (BagObject bagObject) {
-        assertTrue (bagObject.getString (STATUS_KEY).equals (OK_KEY));
-        assertTrue (bagObject.getString (IP_KEY) != null);
+        assertEquals(OK_KEY, bagObject.getString(STATUS_KEY));
+        assertNotNull(bagObject.getString(IP_KEY));
         log.info (IP_KEY + ": " + bagObject.getString (IP_KEY));
-    }
-
-    @Test
-    public void testGetByObject () throws IOException {
-        doGetAssert (servletTester.bagObjectFromGet (BagObject.open (COMMAND_KEY, TEST_KEY)));
-    }
-
-    @Test
-    public void testGetByString () throws IOException {
-        doGetAssert (servletTester.bagObjectFromGet (BagObject.open (COMMAND_KEY, TEST_KEY).toString (MimeType.URL)));
     }
 
     private void doPostAssert (BagObject bagObject, BagObject postData) {
         doGetAssert (bagObject);
-        assertTrue (bagObject.getBagObject (POST_DATA_KEY).equals (postData));
+        assertEquals(bagObject.getBagObject(POST_DATA_KEY), postData);
     }
 
     @Test
@@ -120,7 +97,7 @@ public class Test_Tester extends HttpServlet {
 
         InputStream resourceAsStream = getServletContext ().getResourceAsStream (resourcePath);
         BagObject configuration = BagObjectFrom.inputStream (resourceAsStream);
-        assertTrue (configuration != null);
-        assertTrue (configuration.getString (STATUS_KEY).equals (OK_KEY));
+        assertNotNull(configuration);
+        assertEquals(OK_KEY, configuration.getString(STATUS_KEY));
     }
 }

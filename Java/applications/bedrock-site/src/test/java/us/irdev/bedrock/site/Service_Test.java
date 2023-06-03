@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class Service_Test extends Service {
     private static final Logger log = LogManager.getLogger (Service_Test.class);
@@ -29,9 +29,9 @@ public class Service_Test extends Service {
     public void testPostIP () throws IOException {
         BagObject query = BagObject.open (EVENT, IP_ADDRESS);
         BagObject response = bagObjectFromPost (query);
-        assertTrue (response.getString (STATUS).equals (OK));
+        assertEquals(OK, response.getString(STATUS));
         String ipAddress = response.getBagObject (RESPONSE).getString (IP_ADDRESS);
-        assertTrue (ipAddress != null);
+        assertNotNull(ipAddress);
         log.info (IP_ADDRESS + ": " + ipAddress);
     }
 
@@ -39,25 +39,19 @@ public class Service_Test extends Service {
     public void testPostOk () throws IOException {
         BagObject query = BagObject.open (EVENT, OK);
         BagObject response = bagObjectFromPost (query);
-        assertTrue (response.getString (STATUS).equals (OK));
+        assertEquals(OK, response.getString(STATUS));
     }
 
     @Test
     public void testPostHeaders () throws IOException {
         BagObject query = BagObject.open (EVENT, HEADERS);
         BagObject response = bagObjectFromPost (query);
-        assertTrue (response.getString (STATUS).equals (OK));
+        assertEquals(OK, response.getString(STATUS));
     }
 
     @Test
     public void testEmptyPost () throws IOException {
         BagObject response = bagObjectFromPost (new BagObject ());
-        assertTrue (response.getString (STATUS).equals (ERROR));
-    }
-
-    @Test
-    public void testGet () throws IOException {
-        BagObject response = tester.bagObjectFromGet ("");
-        assertTrue (response.getString (STATUS).equals (ERROR));
+        assertEquals(ERROR, response.getString(STATUS));
     }
 }

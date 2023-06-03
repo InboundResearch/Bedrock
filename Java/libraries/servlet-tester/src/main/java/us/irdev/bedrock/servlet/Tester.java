@@ -22,9 +22,11 @@ public class Tester extends HttpServlet {
 
     public static final String TARGET_DIR = "target";
     public static final String TEST_DIR = "servlet-files";
+    public static final String DO_POST = "doPost";
 
     private File targetTestDir;
     private final HttpServlet httpServlet;
+    private final Method doPostMethod;
 
     public Tester (HttpServlet httpServlet) {
         this.httpServlet = httpServlet;
@@ -35,56 +37,46 @@ public class Tester extends HttpServlet {
         } catch (ServletException exception) {
             log.error (exception);
         }
-    }
 
-    private Method getFetchMethod (String name) {
-        // work around the protected inheritance - this is for testing purposes anyway
-        var declaredMethod = (Method) null;
+        // find the doPost method for testing
+        // httpServlet.doPost (request, response);
         var method = (Method) null;
         try {
-            //httpServlet.doGet (request, response);
-            method = httpServlet.getClass ().getMethod (name, HttpServletRequest.class, HttpServletResponse.class);
+            method = httpServlet.getClass ().getMethod (DO_POST, HttpServletRequest.class, HttpServletResponse.class);
         } catch (NoSuchMethodException ignored) {}
+        var declaredMethod = (Method) null;
         try {
-            //httpServlet.doGet (request, response);
-            declaredMethod = httpServlet.getClass ().getDeclaredMethod (name, HttpServletRequest.class, HttpServletResponse.class);
+            declaredMethod = httpServlet.getClass().getDeclaredMethod(DO_POST, HttpServletRequest.class, HttpServletResponse.class);
         } catch (NoSuchMethodException ignored) {}
-        return (method != null) ? method : declaredMethod;
-    }
-
-    private void callFetchMethod (String name, HttpServletRequest request, HttpServletResponse response) {
-        Method method = getFetchMethod (name);
-        if (method != null) {
-            method.setAccessible (true);
-            try {
-                method.invoke (httpServlet, request, response);
-            } catch (IllegalAccessException | InvocationTargetException exception) {
-                log.error (exception);
-            }
-        }
-    }
-
-    public File fileFromGet (BagObject query) throws IOException {
-        return fileFromGet (query.toString (MimeType.URL));
-    }
-
-    public File fileFromGet (String queryString) throws IOException {
-        var outputFile = new File (targetTestDir, java.util.UUID.randomUUID().toString ());
-        var response = new TestResponse (outputFile);
-        var request = new TestRequest (queryString);
-        callFetchMethod ("doGet", request, response);
-        return outputFile;
+        doPostMethod = (method != null) ? method : declaredMethod;
+        assert (doPostMethod != null);
+        doPostMethod.setAccessible(true);
     }
 
     public File fileFromPost (BagObject query, Bag postData) throws IOException {
         return fileFromPost (query.toString (MimeType.URL), postData);
     }
 
+    /**
+     * a mock routine to get a file from the hosted servlet as if we'd called it
+     * through the web interface
+     * @param queryString - the path to the query interface n the webapp
+     * @param postData - the actual data to be passed in the body
+     * @return the file with the fetch results
+     * @throws IOException
+     */
     public File fileFromPost (String queryString, Bag postData) throws IOException {
+        var request = new TestRequest (queryString, postData);
         var outputFile = new File (targetTestDir, java.util.UUID.randomUUID().toString ());
         var response = new TestResponse (outputFile);
-        var request = new TestRequest (queryString, postData);
-        callFetchMethod ("doPost", request, response);
+
+        // invoke the fetch method it as if it were actually being called in a
+        // web fetch
+        try {
+            doPostMethod.invoke (httpServlet, request, response);
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            log.error (exception);
+        }
         return outputFile;
     }
 
@@ -92,14 +84,6 @@ public class Tester extends HttpServlet {
         var bagObject = BagObjectFrom.file (outputFile);
         outputFile.delete ();
         return bagObject;
-    }
-
-    public BagObject bagObjectFromGet (BagObject query) throws IOException {
-        return bagObjectFromFile (fileFromGet (query));
-    }
-
-    public BagObject bagObjectFromGet (String queryString) throws IOException {
-        return bagObjectFromFile (fileFromGet (queryString));
     }
 
     public BagObject bagObjectFromPost (BagObject query, Bag postData) throws IOException {
@@ -112,12 +96,12 @@ public class Tester extends HttpServlet {
 
     private BagArray bagArrayFromFile (File outputFile) {
         var bagArray = BagArrayFrom.file (outputFile);
-        outputFile.delete ();
+        outputFile.delete();
         return bagArray;
     }
 
-    public BagArray bagArrayFromGet (BagObject query) throws IOException {
-        return bagArrayFromFile (fileFromGet (query));
+    public BagArray bagArrayFromPost (BagObject query, Bag postData) throws IOException {
+        return bagArrayFromFile (fileFromPost (query, postData));
     }
 
 }
