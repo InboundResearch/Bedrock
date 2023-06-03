@@ -105,4 +105,23 @@ export CATALINA_OPTS="$CATALINA_OPTS -agentlib:jdwp=transport=dt_socket,server=y
 <img src="img/IntelliJ-Remote-Debug-Tomcat-B.png" width="40%">
 
 ### Docker
-Launch the docker desktop application and update the settings to start automatically on login.
+After installation with brew, launch the docker desktop application and update the settings to start automatically on login.
+
+## Maven
+Maven settings are needed for deployment. They should be of the form:
+```
+<settings>
+    <profiles>
+        <profile>
+            <id>irdev</id>
+            <properties>
+                <profile-name>Inbound Research</profile-name>
+                <gpg.passphrase>*my gpg passphrase*</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>irdev</activeProfile>
+    </activeProfiles>
+</settings>
+```
