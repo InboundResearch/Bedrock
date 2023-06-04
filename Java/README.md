@@ -1,4 +1,8 @@
-# Bedrock 2
+# Bedrock
+
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+[![Maven Central](https://img.shields.io/maven-central/v/us.irdev.bedrock/bedrock.svg?label=Maven%20Central)](https://search.maven.org/artifact/us.irdev.bedrock/bedrock)
+
 Bedrock is a foundation for rapidly building microservices using JSON for client interactions. All parameters are passed in the message body using POST for security.
 
 ## Requirements
@@ -108,20 +112,32 @@ export CATALINA_OPTS="$CATALINA_OPTS -agentlib:jdwp=transport=dt_socket,server=y
 After installation with brew, launch the docker desktop application and update the settings to start automatically on login.
 
 ## Maven
-Maven settings are needed for deployment. They should be of the form:
+Building Bedrock with maven activates the irdev profile if it's configured in your ~/.m2/settings.xml. Maven settings are needed specifically for deployment, but may use other properties in the future. The settings.xml should be as follows:
 ```
 <settings>
+    <servers>
+        <server>
+            <id>ossrh</id>
+            <username>irdev</username>
+            <password>* the nexus password *</password>
+        </server>
+    </servers>
+
     <profiles>
         <profile>
             <id>irdev</id>
+            <activation>
+                <property>
+                    <name>activate.profile</name>
+                    <value>irdev</value>
+                </property>
+            </activation>
             <properties>
                 <profile-name>Inbound Research</profile-name>
-                <gpg.passphrase>*my gpg passphrase*</gpg.passphrase>
+                <gpg.passphrase>* the gpg passphrase *</gpg.passphrase>
+                <gpg.keyname>info@irdev.us</gpg.keyname>
             </properties>
         </profile>
     </profiles>
-    <activeProfiles>
-        <activeProfile>irdev</activeProfile>
-    </activeProfiles>
 </settings>
 ```
