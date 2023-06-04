@@ -18,12 +18,12 @@
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>logger</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
         </dependency>
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>bag</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>

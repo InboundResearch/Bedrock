@@ -15,28 +15,28 @@
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>logger</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
         </dependency>
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>base</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
         </dependency>
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>bag</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
         </dependency>
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>servlet-tester</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>us.irdev.bedrock</groupId>
             <artifactId>service-base</artifactId>
-            <version>${project.version}</version>
+            <version>${bedrock.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>

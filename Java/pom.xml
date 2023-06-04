@@ -31,6 +31,7 @@
         <tomcat.version>10.1.9</tomcat.version>
         <java.version>17</java.version>
         <nexus.staging.version>1.6.13</nexus.staging.version>
+        <bedrock.version>${project.version}</bedrock.version>
     </properties>
 
     <scm>
