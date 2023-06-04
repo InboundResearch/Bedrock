@@ -30,6 +30,7 @@
         <mongodb.version>4.9.1</mongodb.version>
         <tomcat.version>10.1.9</tomcat.version>
         <java.version>17</java.version>
+        <nexus.staging.version>1.6.13</nexus.staging.version>
     </properties>
 
     <scm>
@@ -139,7 +140,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
+                <version>${nexus.staging.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>

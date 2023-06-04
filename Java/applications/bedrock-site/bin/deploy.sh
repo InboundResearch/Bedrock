@@ -1,10 +1,13 @@
 #! /usr/bin/env bash
 
+# temporary workaround to prevent pushing an unfinished image...
+exit;
+
 . bin/common.sh $1
 
 # exit on any error
 
-# docker setup
+# docker setup, make sure it's running
 set -e
 DOCKER_COUNT=$(docker system info | grep -i images | awk '{print $2}');
 set +e
