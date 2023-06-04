@@ -14,4 +14,17 @@
 
     <name>Nexus Staging</name>
     <description>We skip staging of some submodules, but if you skip staging in the last submodule it skips all staging (a serious error in the design of the nexus staging plugin that has been closed "wontfix" - issues.sonatype.org/browse/NEXUS-9138). The backup solution to that problem is to skip the deploy phase in the submodule. We want to deploy the artifact of bedrock-site to AWS, but not publish the war file to nexus. The recommended solution is to add this dummy node at the end of the submodule list.</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus.staging.version}</version>
+                <configuration>
+                    <skipRemoteStaging>true</skipRemoteStaging>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
