@@ -58,6 +58,7 @@
     <modules>
         <module>libraries</module>
         <module>applications</module>
+        <module>nexus-staging</module>
     </modules>
 
     <build>

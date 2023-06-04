@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # temporary workaround to prevent pushing an unfinished image...
-exit;
+exit 0;
 
 . bin/common.sh $1
 
