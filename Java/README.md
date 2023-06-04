@@ -1,11 +1,6 @@
-# Bedrock
+# Bedrock - Java
 
-[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
-[![Maven Central](https://img.shields.io/maven-central/v/us.irdev.bedrock/bedrock.svg?label=Maven%20Central)](https://search.maven.org/artifact/us.irdev.bedrock/bedrock)
-
-Bedrock is a foundation for rapidly building microservices using JSON for client interactions. All parameters are passed in the message body using POST for security.
-
-## Requirements
+## Build Requirements
 * mongodb
 * docker
 * gcc
@@ -47,8 +42,7 @@ sudo ln -s /usr/local /opt/homebrew
 ```
 
 ### Versions
-
-Working with the brew installations can be troublesome when updates happen and your version disappears. The complete installations are maintained in the `$HOMEBREW_PREFIX/Cellar` directory, but best-practice is to use the symlinks in the `$HOMEBREW_PREFIX/opt` directory, so you don't have to hard code a version. 
+Working with the brew installations of some core packages (like the Java Development Kit) can be troublesome when updates happen and your version disappears. The complete installations are maintained in the `$HOMEBREW_PREFIX/Cellar` directory, but best-practice is to use the symlinks in the `$HOMEBREW_PREFIX/opt` directory, so you don't have to hard code a version. 
 
 There will typically be links to the Cellar named with and without a version number. For instance:
 
@@ -93,7 +87,7 @@ tail -f $HOMEBREW_PREFIX/opt/tomcat/libexec/logs/catalina.out
 ```
 
 #### Live Debugging In Tomcat With IntelliJ
-Configure the tomcat server with the debugger portal open by placing a `setenv.sh` file in the tomcat bin directory (`$HOMEBREW_PREFIX/opt/tomcat/libexec/bin`), with the following code:
+Configure the tomcat server with the debugging port open by placing a `setenv.sh` file in the tomcat bin directory (`$HOMEBREW_PREFIX/opt/tomcat/libexec/bin`), with the following code:
 
 ```
 #! /usr/bin/env bash
@@ -133,7 +127,7 @@ Building Bedrock with maven activates the irdev profile if it's configured in yo
                 </property>
             </activation>
             <properties>
-                <profile-name>Inbound Research</profile-name>
+                <profile-name>irdev (Inbound Research LLC)</profile-name>
                 <gpg.passphrase>* the gpg passphrase *</gpg.passphrase>
                 <gpg.keyname>info@irdev.us</gpg.keyname>
             </properties>
@@ -141,3 +135,5 @@ Building Bedrock with maven activates the irdev profile if it's configured in yo
     </profiles>
 </settings>
 ```
+
+[Maven Central](https://search.maven.org/artifact/us.irdev.bedrock/bedrock)
