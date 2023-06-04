@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"us.irdev.bedrock.secret","l":"us.irdev.bedrock.secret"}];updateSearchResults();
