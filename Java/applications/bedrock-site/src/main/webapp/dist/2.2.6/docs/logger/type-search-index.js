@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"us.irdev.bedrock.logger","l":"Level"},{"p":"us.irdev.bedrock.logger","l":"Logger"},{"p":"us.irdev.bedrock.logger","l":"LogManager"}];updateSearchResults();
