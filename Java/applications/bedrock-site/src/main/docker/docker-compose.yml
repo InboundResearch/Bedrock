@@ -1,0 +1,7 @@
+services:
+  bedrock:
+    container_name: "bedrock"
+    hostname: "bedrock"
+    build: .
+    ports:
+      - "8081:8080"

@@ -1,0 +1,5 @@
+{
+    "values": {
+        "dependencies": ["geometry-ball", "test"]
+    }
+}

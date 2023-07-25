@@ -1,5 +1,4 @@
 {
-    "log-file": "/usr/local/tomcat/logs/catalina.out",
     "schema": {
         "name": "Bedrock Service",
         "description": "Bedrock Service is a simple example designed to demonstrate use of the Bedrock Microservice Architecture and API.",

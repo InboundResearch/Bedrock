@@ -3,14 +3,14 @@
 <div class="container-div">
     <h2>About</h2>
     <div class="description-div">
-        <p>Bedrock is a tool for quickly building lightweight micro-services in Java, using JSON for communications.</p>
+        <p>Bedrock is a tool for quickly building lightweight micro-services in Java using JSON for communications. Bedrock services are designed to run in a Tomcat application server using POST queries for security.</p>
     </div>
 
     <h2>Developer</h2>
     <div class="description-div">
         <ul>
             <li><a href="interface.jsp">Test Interface</a> - an example of the bedrock service and the service descriptor. </li>
-            <li>Find the sources on Github @ <a href="https://github.com/brettonw/bedrock2">brettonw/Bedrock2</a>.</li>
+            <li>Find the sources on Github @ <a href="https://github.com/InboundResearch/Bedrock">InboundResearch/Bedrock</a>.</li>
         </ul>
     </div>
 
