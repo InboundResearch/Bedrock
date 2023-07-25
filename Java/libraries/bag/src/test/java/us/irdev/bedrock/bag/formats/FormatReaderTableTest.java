@@ -2,6 +2,7 @@ package us.irdev.bedrock.bag.formats;
 
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagArrayFrom;
+import us.irdev.bedrock.bag.BagObject;
 import us.irdev.bedrock.bag.BagTest;
 import us.irdev.bedrock.bag.entry.*;
 import org.junit.jupiter.api.Test;
