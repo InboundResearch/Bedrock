@@ -83,6 +83,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -99,25 +100,16 @@
                     <fork>true</fork>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.0</version>
-                <configuration>
-                    <argLine>
-                        --illegal-access=permit
-                    </argLine>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.1.0</version>
-                <configuration>
-                    <argLine>
-                        --illegal-access=permit
-                    </argLine>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -130,12 +122,6 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <!-- these values might not be needed since the passphrase is set in the local settings.xml
-                        <configuration>
-                            <keyname>irdev-dist</keyname>
-                            <passphraseServerId>irdev-dist</passphraseServerId>
-                        </configuration>
-                        -->
                     </execution>
                 </executions>
             </plugin>

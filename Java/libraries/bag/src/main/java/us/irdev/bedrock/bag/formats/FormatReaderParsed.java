@@ -1,8 +1,6 @@
 package us.irdev.bedrock.bag.formats;
 
 import us.irdev.bedrock.logger.*;
-
-
 import java.util.Arrays;
 
 public class FormatReaderParsed extends FormatReader {
@@ -14,14 +12,34 @@ public class FormatReaderParsed extends FormatReader {
     protected int lastLineIndex;
     protected boolean error;
 
-    protected FormatReaderParsed () {}
+    protected static final String WHITESPACE_CHARS = " \u00a0\t";
+    protected static final char NEW_LINE = '\n';
+    protected final char[] whitespaceChars;
 
-    public FormatReaderParsed (String input) {
+
+    protected FormatReaderParsed () {
+        whitespaceChars = sortString (WHITESPACE_CHARS);
+    }
+
+    public FormatReaderParsed (String input, boolean newLineIsWhitespace) {
         super (input);
         inputLength = (input != null) ? input.length () : 0;
         index = 0;
         lineNumber = 1;
         lastLineIndex = 0;
+        this.whitespaceChars = sortString(newLineIsWhitespace ? WHITESPACE_CHARS + NEW_LINE : WHITESPACE_CHARS);
+    }
+
+    public FormatReaderParsed (String input) {
+        this (input, true);
+    }
+
+    protected boolean notIn (char[] inChars, char c) {
+        return Arrays.binarySearch(inChars, c) < 0;
+    }
+
+    protected boolean in (char[] inChars, char c) {
+        return Arrays.binarySearch(inChars, c) >= 0;
     }
 
     /**
@@ -32,24 +50,40 @@ public class FormatReaderParsed extends FormatReader {
         return (! error) && (index < inputLength);
     }
 
-    protected void consumeWhiteSpace () {
-        // consume white space (space, carriage return, tab, etc.
-        while (check ()) {
-            switch (input.charAt (index)) {
-                // tab, space, nbsp
-                case '\t': case ' ': case '\u00a0':
-                    ++index;
-                    break;
-                // carriage return - the file reader converts all returns to \n
-                case '\n':
-                    ++index;
-                    ++lineNumber;
-                    lastLineIndex = index;
-                    break;
-                default:
-                    return;
+    protected int consumeWhile (char[] inChars, boolean allowEscape) {
+        var start = index;
+        char c;
+        while (check () && in (inChars, c = input.charAt (index))) {
+            // make sure to update line numbers if appropriate
+            if (c == NEW_LINE) {
+                ++lineNumber;
+                lastLineIndex = index;
             }
+            // using the escape mechanism is like a free pass for the next character, but we
+            // don't do any transformation on the substring, just return it as written
+            index += ((c == '\\') && allowEscape) ? 2 : 1;
         }
+        return start;
+    }
+
+    protected void consumeWhitespace () {
+        consumeWhile (whitespaceChars, false);
+    }
+
+    protected int consumeUntil (char[] stopChars, boolean allowEscape) {
+        var start = index;
+        char c;
+        while (check () && notIn (stopChars, c = input.charAt (index))) {
+            // make sure to update line numbers if appropriate
+            if (c == NEW_LINE) {
+                ++lineNumber;
+                lastLineIndex = index;
+            }
+            // using the escape mechanism is like a free pass for the next character, but we
+            // don't do any transformation on the substring, just return it as written
+            index += ((c == '\\') && allowEscape) ? 2 : 1;
+        }
+        return start;
     }
 
     /**
@@ -58,10 +92,21 @@ public class FormatReaderParsed extends FormatReader {
      * @return
      */
     protected boolean expect(char c) {
-        consumeWhiteSpace ();
+        consumeWhitespace();
 
         // the next character should be the one we expect
         if (check() && (input.charAt (index) == c)) {
+            ++index;
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean expect(char[] chars) {
+        consumeWhitespace();
+
+        // the next character should be the one we expect
+        if (check() && in(chars, input.charAt (index))) {
             ++index;
             return true;
         }
@@ -104,7 +149,7 @@ public class FormatReaderParsed extends FormatReader {
             // find the end of the current line. note: line endings could only be '\n' because the
             // input reader consumed the actual line endings for us and replaced them with '\n'
             var lineEnd = index;
-            while ((lineEnd < inputLength) && (input.charAt (lineEnd) != '\n')) {
+            while ((lineEnd < inputLength) && (input.charAt (lineEnd) != NEW_LINE)) {
                 ++lineEnd;
             }
             log.error (input.substring (lastLineIndex, lineEnd));
@@ -121,5 +166,36 @@ public class FormatReaderParsed extends FormatReader {
             // set the error state
             error = true;
         }
+    }
+
+    // functions useful to derived classes
+    protected static char[] sortString (String string) {
+        var chars = string.toCharArray ();
+        Arrays.sort (chars);
+        return chars;
+    }
+
+    protected String readString (char[] stopChars) {
+        // " chars " | <chars>
+        var result = (String) null;
+        if (expect('"')) {
+            // digest the string, and be sure to eat the end quote
+            var start = consumeUntil (stopChars, true);
+            result = input.substring (start, index++);
+        }
+        return result;
+    }
+
+    protected String readBareValue (char[] stopChars) {
+        // " chars " | <chars>
+        var result = (String) null;
+        var start = consumeUntil (stopChars, true);
+
+        // capture the result if we actually consumed some characters
+        if (index > start) {
+            result = input.substring (start, index);
+        }
+
+        return result;
     }
 }

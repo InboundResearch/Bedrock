@@ -2,13 +2,11 @@ package us.irdev.bedrock.bag.formats;
 
 // The FormatReaderJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
-// strings internally), and assume the input is a well formed string representation of a BagObject
+// strings internally), and assume the input is a well-formed string representation of a BagObject
 // or BagArray in JSON-ish format
 
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
-
-import java.util.Arrays;
 
 public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatReader, ObjectFormatReader {
     public FormatReaderJson () {}
@@ -90,77 +88,25 @@ public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatR
 
     private boolean readPair (BagObject bagObject) {
         // <Pair> ::= <String> : <Value>
-        var key = readString ();
+        var key = readString (QUOTED_STRING_STOP_CHARS);
         return (key != null) && (key.length () > 0) && require (':') && require (storeValue (bagObject, key), "Valid value");
     }
 
     private static final char[] BARE_VALUE_STOP_CHARS = sortString (" \u00a0\t\n:{}[]\",");
     private static final char[] QUOTED_STRING_STOP_CHARS = sortString ("\n\"");
 
-    private static char[] sortString (String string) {
-        var chars = string.toCharArray ();
-        Arrays.sort (chars);
-        return chars;
-    }
-
-    private boolean notIn (char[] stopChars, char c) {
-        int i = 0;
-        int end = stopChars.length;
-        char stopChar = 0;
-        while ((i < end) && (c > (stopChar = stopChars[i]))) {
-            ++i;
-        }
-        return stopChar != c;
-    }
-
-    private int consumeUntilStop (char[] stopChars) {
-        var start = index;
-        char c;
-        //while (check () && (Arrays.binarySearch (stopChars, c = input.charAt (index)) < 0)) {
-        while (check () && notIn (stopChars, (c = input.charAt (index)))) {
-            // using the escape mechanism is like a free pass for the next character, but we
-            // don't do any transformation on the substring, just return it as written
-            index += (c == '\\') ? 2 : 1;
-        }
-        return start;
-    }
-
-    private String readString () {
-        // " chars " | <chars>
-        var result = (String) null;
-        if (expect('"')) {
-            // digest the string, and be sure to eat the end quote
-            var start = consumeUntilStop (QUOTED_STRING_STOP_CHARS);
-            result = input.substring (start, index++);
-        }
-        return result;
-    }
-
-    private String readBareValue () {
-        // " chars " | <chars>
-        var result = (String) null;
-
-        // technically, we're being sloppy allowing bare values in some cases where quoted strings
-        // are the standard, but it's part of the simplified structure we support. This allows us to
-        // read valid JSON files without handling every single pedantic case.
-        var start = consumeUntilStop (BARE_VALUE_STOP_CHARS);
-
-        // capture the result if we actually consumed some characters
-        if (index > start) {
-            result = input.substring (start, index);
-        }
-
-        return result;
-    }
-
     private Object readValue () {
         // <Value> ::= <String> | <Object> | <Array>
-        consumeWhiteSpace ();
+        consumeWhitespace();
         return check () ? switch (input.charAt(index)) {
             case '{' -> readBagObject();
             case '[' -> readBagArray();
-            case '"' -> readString();
-            default -> readBareValue();
+            case '"' -> readString(QUOTED_STRING_STOP_CHARS);
+
+            // technically, we're being sloppy allowing bare values in some cases where quoted strings
+            // are the standard, but it's part of the simplified structure we support. This allows us to
+            // read valid JSON files without handling every single pedantic case.
+            default -> readBareValue(BARE_VALUE_STOP_CHARS);
         } : null;
     }
 

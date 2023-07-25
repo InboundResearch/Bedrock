@@ -97,6 +97,7 @@ public class FormatReader {
         // classes of FormatReader here that need to be loaded.
         var formatReaders = new Class[] {
                 FormatReaderComposite.class,
+                FormatReaderDelimited.class,
                 FormatReaderJson.class,
                 FormatReaderTable.class
         };
