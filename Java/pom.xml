@@ -6,7 +6,7 @@
         <mongodb.version>4.9.1</mongodb.version>
         <tomcat.version>10.1.9</tomcat.version>
         <java.version>17</java.version>
-        <bedrock.version>2.2.6-SNAPSHOT</bedrock.version>
+        <bedrock.version>2.2.6</bedrock.version>
     </properties>
 
     <groupId>us.irdev.bedrock</groupId>
@@ -151,6 +151,7 @@
                 <configuration>
                     <updatePomFile>true</updatePomFile>
                     <outputDirectory>target</outputDirectory>
+                    <flattenMode>minimum</flattenMode>
                 </configuration>
                 <executions>
                     <execution>
