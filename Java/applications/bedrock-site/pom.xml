@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>us.irdev.bedrock</groupId>
         <artifactId>applications</artifactId>
-        <version>2.2.7-SNAPSHOT</version>
+        <version>2.2.6</version>
     </parent>
 
     <artifactId>bedrock-site</artifactId>
@@ -40,7 +38,7 @@
                         <configuration>
                             <target>
                                 <exec executable="bash" failonerror="true">
-                                    <redirector output="target/build-clean.log" alwayslog="true"/>
+                                    <redirector output="target/build-clean.log" alwayslog="true" />
                                     <arg value="-c" />
                                     <arg value="bin/clean.sh &quot;${project.build.finalName} ${project.version}&quot;" />
                                 </exec>
@@ -56,7 +54,7 @@
                         <configuration>
                             <target>
                                 <exec executable="bash" failonerror="true">
-                                    <redirector output="target/build-generate-sources.log" alwayslog="true"/>
+                                    <redirector output="target/build-generate-sources.log" alwayslog="true" />
                                     <arg value="-c" />
                                     <arg value="bin/generate-sources.sh &quot;${project.build.finalName} ${project.version}&quot;" />
                                 </exec>
@@ -72,7 +70,7 @@
                         <configuration>
                             <target>
                                 <exec executable="bash" failonerror="true">
-                                    <redirector output="target/build-test.log" alwayslog="true"/>
+                                    <redirector output="target/build-test.log" alwayslog="true" />
                                     <arg value="-c" />
                                     <arg value="bin/test.sh &quot;${project.build.finalName} ${project.version}&quot;" />
                                 </exec>
@@ -88,7 +86,7 @@
                         <configuration>
                             <target>
                                 <exec executable="bash" failonerror="true">
-                                    <redirector output="target/build-install.log" alwayslog="true"/>
+                                    <redirector output="target/build-install.log" alwayslog="true" />
                                     <arg value="-c" />
                                     <arg value="bin/install.sh &quot;${project.build.finalName} ${project.version}&quot;" />
                                 </exec>
@@ -104,7 +102,7 @@
                         <configuration>
                             <target>
                                 <exec executable="bash" failonerror="true">
-                                    <redirector output="target/build-deploy.log" alwayslog="true"/>
+                                    <redirector output="target/build-deploy.log" alwayslog="true" />
                                     <arg value="-c" />
                                     <arg value="bin/deploy.sh &quot;${project.build.finalName} ${project.version}&quot;" />
                                 </exec>
