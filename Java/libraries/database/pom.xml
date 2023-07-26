@@ -4,7 +4,7 @@
     <parent>
         <groupId>us.irdev.bedrock</groupId>
         <artifactId>libraries</artifactId>
-        <version>2.2.7-SNAPSHOT</version>
+        <version>${bedrock.version}</version>
     </parent>
 
     <artifactId>database</artifactId>
@@ -30,13 +30,5 @@
             <version>${mongodb.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
     </dependencies>
 </project>
