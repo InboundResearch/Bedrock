@@ -35,11 +35,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git@github.com:InboundResearch/Bedrock.git</connection>
-        <developerConnection>scm:git:git@github.com:InboundResearch/Bedrock.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/InboundResearch/Bedrock.git</connection>
         <url>https://github.com/InboundResearch/Bedrock.git</url>
-      <tag>2.2.6</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
