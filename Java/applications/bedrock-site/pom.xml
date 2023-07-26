@@ -6,7 +6,7 @@
     <parent>
         <groupId>us.irdev.bedrock</groupId>
         <artifactId>applications</artifactId>
-        <version>2.2.6-SNAPSHOT</version>
+        <version>${bedrock.version}</version>
     </parent>
 
     <artifactId>bedrock-site</artifactId>
@@ -25,7 +25,6 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>${nexus.staging.version}</version>
                 <configuration>
                     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
                 </configuration>
