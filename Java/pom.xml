@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <bedrock.version>2.2.7-SNAPSHOT</bedrock.version>
+        <bedrock.version>2.2.7</bedrock.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mongodb.version>4.9.1</mongodb.version>
