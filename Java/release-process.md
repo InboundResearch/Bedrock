@@ -9,7 +9,7 @@ Bedrock is currently deployed via Sonatype Nexus and the web app is built into a
 6) mvn clean install
 7) check in the newly built artifacts that have to be preserved (the web distribution, for example)
 8) git tag -a 'Release-$version' -m 'Release-$version'
-8) mvn clean deploy
+8) mvn clean deploy libraries
 9) merge main changes back to development (again using a pull request)
 10) check the development branch
 11) increment the parent pom bedrock version, add "-SNAPSHOT" to it, and check in the change
