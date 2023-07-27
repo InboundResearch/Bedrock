@@ -11,7 +11,7 @@ Bedrock is currently deployed via Sonatype Nexus and the web app is built into a
 8) git tag -a 'Release-$version' -m 'Release-$version'
 8) mvn clean deploy libraries
 9) merge main changes back to development (again using a pull request)
-10) check the development branch
+10) check out the development branch
 11) increment the parent pom bedrock version, add "-SNAPSHOT" to it, and check in the change
 12) mvn clean install
 13) (NOT APPLICABLE TO BEDROCK 2) deploy the site changes by navigating to AWS and stopping the task associated with the running instance. AWS will automatically relaunch a new instance with the updated container definition.
