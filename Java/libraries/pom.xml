@@ -11,6 +11,17 @@
     <packaging>pom</packaging>
     <name>Libraries</name>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <modules>
         <module>logger</module>
         <module>base</module>
@@ -95,7 +106,7 @@
                 <configuration>
                     <updatePomFile>true</updatePomFile>
                     <outputDirectory>target</outputDirectory>
-                    <flattenMode>minimum</flattenMode>
+                    <flattenMode>ossrh</flattenMode>
                 </configuration>
                 <executions>
                     <execution>
