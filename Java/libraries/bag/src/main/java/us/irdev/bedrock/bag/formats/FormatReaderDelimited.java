@@ -37,13 +37,7 @@ public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFo
 
   private String readEntry() {
     String entry = readString(QUOTED_STRING_STOP_CHARS);
-    if (entry != null) {
-      // eat up whitespace after a quoted string
-      consumeWhitespace();
-    } else {
-      entry = readBareValue(bareValueStopChars);
-    }
-    return entry;
+    return (entry != null) ? entry : readBareValue(bareValueStopChars);
   }
 
 

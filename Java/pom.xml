@@ -23,6 +23,7 @@
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 
         <!-- goal: eliminate these -->
         <commons-io.version>2.13.0</commons-io.version>
@@ -73,6 +74,33 @@
 
     <build>
         <plugins>
+            <!-- sets the is.snapshot property to true if version is a SNAPSHOT -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-helper-regex-is-snapshot</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>regex-properties</goal>
+                        </goals>
+                        <configuration>
+                            <regexPropertySettings>
+                                <regexPropertySetting>
+                                    <name>is.snapshot</name>
+                                    <value>${bedrock.version}</value>
+                                    <regex>.*-SNAPSHOT</regex>
+                                    <replacement>true</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </regexPropertySetting>
+                            </regexPropertySettings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -87,6 +115,7 @@
                             <target>
                                 <!-- this profile-name comes from the settings.xml/profile properties -->
                                 <echo level="info" message="current profile: ${profile-name}" />
+                                <echo level="info" message="is.snapshot = ${is.snapshot}" />
                             </target>
                         </configuration>
                     </execution>
@@ -104,7 +133,9 @@
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
+                        <!--
                         <arg>-Xlint:unchecked</arg>
+                        -->
                     </compilerArgs>
                     <fork>true</fork>
                 </configuration>

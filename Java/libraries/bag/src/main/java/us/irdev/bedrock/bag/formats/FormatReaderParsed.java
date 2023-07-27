@@ -50,18 +50,31 @@ public class FormatReaderParsed extends FormatReader {
         return (! error) && (index < inputLength);
     }
 
+    protected boolean inspectForNewLine(char c) {
+        if (c == NEW_LINE) {
+            ++lineNumber;
+            lastLineIndex = index;
+            return true;
+        }
+        return false;
+    }
+
     protected int consumeWhile (char[] inChars, boolean allowEscape) {
         var start = index;
         char c;
         while (check () && in (inChars, c = input.charAt (index))) {
-            // make sure to update line numbers if appropriate
-            if (c == NEW_LINE) {
-                ++lineNumber;
-                lastLineIndex = index;
+            inspectForNewLine(c);
+
+            // using the escape mechanism is like a free pass for the next character, but we don't
+            // do any transformation on the substring, just return it as written after checking for
+            // newlines
+            if ((c == '\\') && allowEscape) {
+                ++index;
+                inspectForNewLine(input.charAt (index));
             }
-            // using the escape mechanism is like a free pass for the next character, but we
-            // don't do any transformation on the substring, just return it as written
-            index += ((c == '\\') && allowEscape) ? 2 : 1;
+
+            // consume the character
+            ++index;
         }
         return start;
     }
@@ -74,14 +87,18 @@ public class FormatReaderParsed extends FormatReader {
         var start = index;
         char c;
         while (check () && notIn (stopChars, c = input.charAt (index))) {
-            // make sure to update line numbers if appropriate
-            if (c == NEW_LINE) {
-                ++lineNumber;
-                lastLineIndex = index;
+            inspectForNewLine(c);
+
+            // using the escape mechanism is like a free pass for the next character, but we don't
+            // do any transformation on the substring, just return it as written after checking for
+            // newlines
+            if ((c == '\\') && allowEscape) {
+                ++index;
+                inspectForNewLine(input.charAt (index));
             }
-            // using the escape mechanism is like a free pass for the next character, but we
-            // don't do any transformation on the substring, just return it as written
-            index += ((c == '\\') && allowEscape) ? 2 : 1;
+
+            // consume the character
+            ++index;
         }
         return start;
     }
@@ -96,6 +113,7 @@ public class FormatReaderParsed extends FormatReader {
 
         // the next character should be the one we expect
         if (check() && (input.charAt (index) == c)) {
+            inspectForNewLine(c);
             ++index;
             return true;
         }
@@ -106,7 +124,9 @@ public class FormatReaderParsed extends FormatReader {
         consumeWhitespace();
 
         // the next character should be the one we expect
-        if (check() && in(chars, input.charAt (index))) {
+        char c;
+        if (check() && in(chars, (c = input.charAt (index)))) {
+            inspectForNewLine(c);
             ++index;
             return true;
         }
