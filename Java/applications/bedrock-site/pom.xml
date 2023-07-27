@@ -20,15 +20,6 @@
     <build>
         <finalName>bedrock</finalName>
         <plugins>
-            <!--
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <configuration>
-                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-                </configuration>
-            </plugin>
-            -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
