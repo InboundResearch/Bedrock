@@ -106,7 +106,7 @@ public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatR
             // technically, we're being sloppy allowing bare values in some cases where quoted strings
             // are the standard, but it's part of the simplified structure we support. This allows us to
             // read valid JSON files without handling every single pedantic case.
-            default -> readBareValue(BARE_VALUE_STOP_CHARS);
+            default -> readBareValueUntil (BARE_VALUE_STOP_CHARS);
         } : null;
     }
 

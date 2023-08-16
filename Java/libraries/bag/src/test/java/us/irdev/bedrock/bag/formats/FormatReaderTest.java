@@ -15,4 +15,9 @@ public class FormatReaderTest {
         BagObject bagObject = BagObjectFrom.file (new File ("data", "title.properties"));
         assertTrue (bagObject.getString ("note").equals ("this is a test"));
     }
+
+    @Test
+    public void testSortString () {
+
+    }
 }

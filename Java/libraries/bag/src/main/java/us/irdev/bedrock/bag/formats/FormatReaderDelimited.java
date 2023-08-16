@@ -2,8 +2,6 @@ package us.irdev.bedrock.bag.formats;
 
 import us.irdev.bedrock.bag.BagArray;
 
-import java.util.ArrayList;
-
 // reads a delimited table format, like CSV, or tab delimited... the result is an array of bag-objects
 // representing the named columns. we either require a first line that contains the columns or a
 // supplied array of column names. comment lines are allowed outside of an entry.
@@ -20,6 +18,7 @@ public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFo
     delimiter = comment = ' ';
     bareValueStopChars = null;
   }
+
   private FormatReaderDelimited (String input, char delimiter, char comment) {
     super (input, false);
     this.delimiter = delimiter;
@@ -37,7 +36,7 @@ public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFo
 
   private String readEntry() {
     String entry = readString(QUOTED_STRING_STOP_CHARS);
-    return (entry != null) ? entry : readBareValue(bareValueStopChars);
+    return (entry != null) ? entry : readBareValueUntil (bareValueStopChars);
   }
 
 
