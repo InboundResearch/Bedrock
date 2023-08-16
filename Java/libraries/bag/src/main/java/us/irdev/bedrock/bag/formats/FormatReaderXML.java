@@ -3,6 +3,8 @@ package us.irdev.bedrock.bag.formats;
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
 
+import static us.irdev.bedrock.bag.formats.Utility.sortString;
+
 // reads an XML-ish formatted string, without some of the arbitrary constraints, and without some of
 // the esoteric capabilities (namespaces, etc.). The intent is to support basic data in XML format
 // and things like Maven POM files. See the description of XML at https://www.w3.org/TR/xml11/
@@ -26,29 +28,8 @@ public class FormatReaderXML extends FormatReaderParsed implements ArrayFormatRe
     return tag;
   }
 
-  private static final char[] ELEMENT_OPEN_TAG_STOP_CHARS = sortString (" />");
-  private BagObject readElement () {
-    if (expect ('<')) {
-      // tag name - consume until whitespace or tag stop chars [/>\s]
-      String value = readBareValueUntil ();
-      var tag = readAttributes (BagObject.open ("_tag", value));
-      // attributes - consume whitespace
-      // close -> body -> tagStop
-      // end [/>]
-    }
-    return null;
-  }
-
   public BagArray readBagArray () {
     BagArray array = null;
-    BagObject element;
-    while ((element = readElement ()) != null) {
-      if (array == null) {
-        array = BagArray.open (element);
-      } else {
-        array.add (element);
-      }
-    }
     return array;
   }
 }

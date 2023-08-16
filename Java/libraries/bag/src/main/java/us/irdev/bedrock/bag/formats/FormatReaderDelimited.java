@@ -2,6 +2,8 @@ package us.irdev.bedrock.bag.formats;
 
 import us.irdev.bedrock.bag.BagArray;
 
+import static us.irdev.bedrock.bag.formats.Utility.sortString;
+
 // reads a delimited table format, like CSV, or tab delimited... the result is an array of bag-objects
 // representing the named columns. we either require a first line that contains the columns or a
 // supplied array of column names. comment lines are allowed outside of an entry.

@@ -8,6 +8,7 @@ public abstract class Scanner {
   private final String startStateName;
   protected String currentStateName;
   private String currentToken;
+  protected int offset;
 
   protected static final String DEFAULT_START_STATE_NAME = "start";
 
@@ -41,6 +42,7 @@ public abstract class Scanner {
 
   public Scanner reset () {
     currentToken = "";
+    offset = 0;
     return setCurrentState(startStateName);
   }
 
@@ -67,32 +69,35 @@ public abstract class Scanner {
       var storage = action.getStorage();
       if (storage == StorageType.STORE_INPUT_BEFORE_EMIT) {
         currentToken += input;
+        ++offset;
       }
 
       // if we should emit...
       var actionEmit = action.getEmit();
+      var nextStateName = action.getNextState();
       if (actionEmit != null) {
-        emit (actionEmit, currentToken);
+        emit (actionEmit, currentToken, nextStateName);
         currentToken = "";
       }
 
       // if we should store the input to the token after emitting...
       if (storage == StorageType.STORE_INPUT_AFTER_EMIT) {
         currentToken += input;
+        ++offset;
       }
 
       // advance to the next state
-      currentStateName = action.getNextState ();
+      currentStateName = nextStateName;
     }
   }
 
   public Scanner scan(String input) {
     reset();
-    for (int i = 0; i < input.length(); ++i) {
-      handleInput(input.charAt(i));
+    while (offset < input.length ()) {
+      handleInput(input.charAt(offset));
     }
     return this;
   }
 
-  public abstract void emit (String actionEmit, String token);
+  public abstract void emit (String actionEmit, String token, String nextStateName);
 }

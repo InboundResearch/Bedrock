@@ -8,6 +8,8 @@ package us.irdev.bedrock.bag.formats;
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
 
+import static us.irdev.bedrock.bag.formats.Utility.sortString;
+
 public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatReader, ObjectFormatReader {
     public FormatReaderJson () {}
 
