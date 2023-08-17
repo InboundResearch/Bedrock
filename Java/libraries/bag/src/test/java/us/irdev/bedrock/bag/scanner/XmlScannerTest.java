@@ -8,8 +8,13 @@ public class XmlScannerTest extends XmlScanner {
   private static final Logger log = LogManager.getLogger (XmlScannerTest.class);
 
   @Test
-  public void testXmlScanner () {
-    scan ("<xml><blah x=\"hello\"/></xml>");
+  public void testXmlScanner1 () {
+    scan ("<xml>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+  }
+
+  @Test
+  public void testXmlScanner2 () {
+    scan ("<xml /x>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
   }
 
   @Override
