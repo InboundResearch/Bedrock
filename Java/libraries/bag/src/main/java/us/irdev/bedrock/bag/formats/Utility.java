@@ -8,5 +8,4 @@ public class Utility {
     Arrays.sort (chars);
     return chars;
   }
-
 }

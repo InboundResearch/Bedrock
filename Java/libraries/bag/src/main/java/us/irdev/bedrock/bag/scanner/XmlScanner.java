@@ -1,118 +1,172 @@
 package us.irdev.bedrock.bag.scanner;
 
 public class XmlScanner extends Scanner {
-  private final String DEFAULT_STATE = DEFAULT_START_STATE_NAME;
-  private final String ERROR_STATE = "error";
-  private final String BODY_STATE = "body";
-  private final String BEGIN_OPEN_ELEMENT_STATE = "begin-open-element";
-  private final String OPEN_ELEMENT_STATE = "open-element";
-  private final String END_OPEN_ELEMENT_STATE = "end-open-element";
-  private final String CLOSE_ELEMENT_STATE = "close-element";
-  private final String END_CLOSE_ELEMENT_STATE = "end-close-element";
-  private final String SPECIAL_ELEMENT_STATE = "special-element";
-  private final String EMPTY_ELEMENT_STATE = "empty-element";
-  private final String ATTRIBUTE_NAME_STATE = "attribute-name";
-  private final String ATTRIBUTE_EQ_STATE = "attribute-eq";
-  private final String ATTRIBUTE_SQUOTE_STATE_1 = "attribute-single-quote-1";
-  private final String ATTRIBUTE_SQUOTE_STATE_2 = "attribute-single-quote-2";
-  private final String ATTRIBUTE_SQUOTE_STATE_3 = "attribute-single-quote-3";
-  private final String ATTRIBUTE_DQUOTE_STATE_1 = "attribute-double-quote-1";
-  private final String ATTRIBUTE_DQUOTE_STATE_2 = "attribute-double-quote-2";
-  private final String ATTRIBUTE_DQUOTE_STATE_3 = "attribute-double-quote-3";
+  private static final boolean CAPTURE = true;
+  private static final boolean DONT_CAPTURE = false;
 
-  private final String NO_EMIT = null;
-  private final String EMIT_WHITESPACE = "whitespace";
-  private final String EMIT_ERROR = "error";
-  private final String EMIT_BODY = "body";
-  private final String EMIT_BEGIN_OPEN_ELEMENT = "begin-open-element";
-  private final String EMIT_OPEN_ELEMENT = "open-element";
-  private final String EMIT_END_OPEN_ELEMENT = "end-open-element";
-  private final String EMIT_BEGIN_CLOSE_ELEMENT = "begin-close-element";
-  private final String EMIT_CLOSE_ELEMENT = "close-element";
-  private final String EMIT_END_CLOSE_ELEMENT = "end-close-element";
-  private final String EMIT_SPECIAL_ELEMENT = "special-element";
-  private final String EMIT_EMPTY_ELEMENT = "empty-element";
-  private final String EMIT_ATTRIBUTE_NAME = "attribute-name";
-  private final String EMIT_ATTRIBUTE_EQ = "attribute-eq";
-  private final String EMIT_ATTRIBUTE_VALUE = "attribute-value";
-  private final String EMIT_OPEN_QUOTE = "open-quote";
-  private final String EMIT_CLOSE_QUOTE = "close-quote";
+  private static final String DEFAULT_STATE = DEFAULT_START_STATE_NAME;
+  private static final String BODY_STATE = "body";
+  private static final String BEGIN_OPEN_ELEMENT_STATE = "begin-open-element";
+  private static final String OPEN_ELEMENT_STATE = "open-element";
+  private static final String END_OPEN_ELEMENT_STATE = "end-open-element";
+  private static final String CLOSE_ELEMENT_STATE = "close-element";
+  private static final String END_CLOSE_ELEMENT_STATE = "end-close-element";
+  private static final String EMPTY_ELEMENT_STATE = "empty-element";
+  private static final String ATTRIBUTE_NAME_STATE = "attribute-name";
+  private static final String ATTRIBUTE_EQ_STATE = "attribute-eq";
+  private static final String ATTRIBUTE_OPEN_SQUOTE_STATE = "attribute-open-single-quote";
+  private static final String ATTRIBUTE_SQUOTE_BODY = "attribute-single-quote-body";
+  private static final String ATTRIBUTE_CLOSE_SQUOTE_STATE = "attribute-close-single-quote";
+  private static final String ATTRIBUTE_OPEN_DQUOTE_STATE = "attribute-open-double-quote";
+  private static final String ATTRIBUTE_DQUOTE_BODY = "attribute-double-quote-body";
+  private static final String ATTRIBUTE_CLOSE_DQUOTE_STATE = "attribute-close-double-quote";
 
-  private final String WHITESPACE = " \t\n\f\r";
+  // special elements take the form <? ... ?> - do we care?
+  private static final String PROLOG_STATE = "prolog";
+  private static final String END_PROLOG_STATE = "end-prolog";
 
-  private StrategyInclusive addState(String stateName, String anyInputNextState, StorageType anyInputStorageType, String anyInputEmit) throws DuplicateInputException, DuplicateStateException {
-    var inclusive = new StrategyInclusive ();
-            //.addAction ('\0', new Action (DEFAULT_STATE, StorageType.DONT_STORE_INPUT, nullInputEmit));
-    addState(new State (stateName)
-            .addStrategy (inclusive)
-            .addStrategy (new StrategyAny (new Action (anyInputNextState, anyInputStorageType, anyInputEmit)))
-    );
-    return inclusive;
-  }
+  // from DECL state (<!), we recognize -- as the beginning of a comment and
+  // --> as the end. this is important as comments may be used to hide other xml
+  // from the parser. The remainder of decl types are simply scanned for the
+  // close bracket
+  private static final String DECL_START_STATE = "decl-start";
+  private static final String DECL_BODY_STATE = "decl-body";
+  private static final String COMMENT_STATE_2 = "comment-2";
+  private static final String COMMENT_BODY_STATE = "comment-body";
+  private static final String COMMENT_STATE_4 = "comment-4";
+  private static final String COMMENT_STATE_5 = "comment-5";
+
+  private static final String NO_EMIT = null;
+  private static final String EMIT_WHITESPACE = "whitespace";
+  private static final String EMIT_BODY = "body";
+  private static final String EMIT_BEGIN_OPEN_ELEMENT = "begin-open-element";
+  private static final String EMIT_OPEN_ELEMENT = "open-element";
+  private static final String EMIT_END_OPEN_ELEMENT = "end-open-element";
+  private static final String EMIT_BEGIN_CLOSE_ELEMENT = "begin-close-element";
+  private static final String EMIT_CLOSE_ELEMENT = "close-element";
+  private static final String EMIT_END_CLOSE_ELEMENT = "end-close-element";
+  private static final String EMIT_SPECIAL_ELEMENT = "special-element";
+  private static final String EMIT_DECL = "decl";
+  private static final String EMIT_COMMENT = "comment";
+  private static final String EMIT_EMPTY_ELEMENT = "empty-element";
+  private static final String EMIT_ATTRIBUTE_NAME = "attribute-name";
+  private static final String EMIT_ATTRIBUTE_EQ = "attribute-eq";
+  private static final String EMIT_ATTRIBUTE_VALUE = "attribute-value";
+  private static final String EMIT_OPEN_QUOTE = "open-quote";
+  private static final String EMIT_CLOSE_QUOTE = "close-quote";
+
+  private static final String WHITESPACE = " \t\n\r";
 
   public XmlScanner() {
     super();
 
     try {
-      addState(ERROR_STATE, ERROR_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT);
+      addState (ERROR_STATE)
+              .onAnyInput(ERROR_STATE, CAPTURE, NO_EMIT);
 
-      addState(DEFAULT_STATE, BODY_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("<", BEGIN_OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_BEGIN_OPEN_ELEMENT);
+      addState (DEFAULT_STATE)
+              .onAnyInput(BODY_STATE, CAPTURE, NO_EMIT)
+              .onInput("<", BEGIN_OPEN_ELEMENT_STATE, CAPTURE, NO_EMIT);
 
-      addState(BODY_STATE, BODY_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("<", DEFAULT_STATE, StorageType.DONT_STORE_INPUT, EMIT_BODY);
+      addState (BODY_STATE)
+              .onAnyInput(BODY_STATE, CAPTURE, NO_EMIT)
+              .onInput("<", DEFAULT_STATE, DONT_CAPTURE, EMIT_BODY);
 
-      addState(BEGIN_OPEN_ELEMENT_STATE, OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("/", CLOSE_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_BEGIN_CLOSE_ELEMENT)
-              .addAction ("!?", SPECIAL_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT);
+      addState (BEGIN_OPEN_ELEMENT_STATE)
+              .onAnyInput(OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_BEGIN_OPEN_ELEMENT)
+              .onInput("/", CLOSE_ELEMENT_STATE, CAPTURE, EMIT_BEGIN_CLOSE_ELEMENT)
+              .onInput("?", PROLOG_STATE, CAPTURE, NO_EMIT)
+              .onInput("!", DECL_START_STATE, CAPTURE, NO_EMIT);
 
-      addState(OPEN_ELEMENT_STATE, OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("/>", END_OPEN_ELEMENT_STATE, StorageType.DONT_STORE_INPUT, EMIT_OPEN_ELEMENT)
-              .addAction (WHITESPACE, END_OPEN_ELEMENT_STATE, StorageType.DONT_STORE_INPUT, EMIT_OPEN_ELEMENT);
+      addState (OPEN_ELEMENT_STATE)
+              .onAnyInput(OPEN_ELEMENT_STATE, CAPTURE, NO_EMIT)
+              .onInput("/>", END_OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_OPEN_ELEMENT)
+              .onInput(WHITESPACE, END_OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_OPEN_ELEMENT);
 
-      addState(END_OPEN_ELEMENT_STATE, ATTRIBUTE_NAME_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("/", EMPTY_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction (">", DEFAULT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_END_OPEN_ELEMENT)
-              .addAction (WHITESPACE, END_OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_WHITESPACE);
+      addState (END_OPEN_ELEMENT_STATE)
+              .onAnyInput(ATTRIBUTE_NAME_STATE, CAPTURE, NO_EMIT)
+              .onInput("/", EMPTY_ELEMENT_STATE, CAPTURE, NO_EMIT)
+              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_END_OPEN_ELEMENT)
+              .onInput(WHITESPACE, END_OPEN_ELEMENT_STATE, CAPTURE, EMIT_WHITESPACE);
 
-      addState(CLOSE_ELEMENT_STATE, CLOSE_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction (">", END_CLOSE_ELEMENT_STATE, StorageType.DONT_STORE_INPUT, EMIT_CLOSE_ELEMENT);
+      addState (CLOSE_ELEMENT_STATE)
+              .onAnyInput(CLOSE_ELEMENT_STATE, CAPTURE, NO_EMIT)
+              .onInput(">", END_CLOSE_ELEMENT_STATE, DONT_CAPTURE, EMIT_CLOSE_ELEMENT);
 
-      addState(END_CLOSE_ELEMENT_STATE, ERROR_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_ERROR)
-              .addAction (">", DEFAULT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_END_CLOSE_ELEMENT);
+      addState (END_CLOSE_ELEMENT_STATE)
+              .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
+              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_END_CLOSE_ELEMENT);
 
-      addState(SPECIAL_ELEMENT_STATE, SPECIAL_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction (">", DEFAULT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_SPECIAL_ELEMENT);
+      addState (DECL_START_STATE)
+              .onAnyInput(DECL_BODY_STATE, DONT_CAPTURE, NO_EMIT)
+              .onInput("-", COMMENT_STATE_2, CAPTURE, NO_EMIT);
 
-      addState(EMPTY_ELEMENT_STATE, ERROR_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_ERROR)
-              .addAction (">", DEFAULT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_EMPTY_ELEMENT);
+      addState (DECL_BODY_STATE)
+              .onAnyInput(DECL_BODY_STATE, CAPTURE, NO_EMIT)
+              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_DECL);
 
-      addState(ATTRIBUTE_NAME_STATE, ATTRIBUTE_NAME_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction (">", END_OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_AFTER_EMIT, EMIT_ATTRIBUTE_NAME)
-              .addAction (WHITESPACE + "=", ATTRIBUTE_EQ_STATE, StorageType.STORE_INPUT_AFTER_EMIT, EMIT_ATTRIBUTE_NAME);
+      addState (COMMENT_STATE_2)
+              .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
+              .onInput("-", COMMENT_BODY_STATE, CAPTURE, NO_EMIT);
 
-      addState(ATTRIBUTE_EQ_STATE, ERROR_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_ERROR)
-              .addAction ("=", ATTRIBUTE_EQ_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("'", ATTRIBUTE_SQUOTE_STATE_1, StorageType.DONT_STORE_INPUT, EMIT_ATTRIBUTE_EQ)
-              .addAction ("\"", ATTRIBUTE_DQUOTE_STATE_1, StorageType.DONT_STORE_INPUT, EMIT_ATTRIBUTE_EQ)
-              .addAction (WHITESPACE, ATTRIBUTE_EQ_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT);
+      addState (COMMENT_BODY_STATE)
+              .onAnyInput(COMMENT_BODY_STATE, CAPTURE, NO_EMIT)
+              .onInput("-", COMMENT_STATE_4, CAPTURE, NO_EMIT);
 
-      addState(ATTRIBUTE_SQUOTE_STATE_1, ATTRIBUTE_SQUOTE_STATE_2, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_OPEN_QUOTE);
+      addState (COMMENT_STATE_4)
+              .onAnyInput(COMMENT_BODY_STATE, CAPTURE, NO_EMIT)
+              .onInput("-", COMMENT_STATE_5, CAPTURE, NO_EMIT);
 
-      addState(ATTRIBUTE_SQUOTE_STATE_2, ATTRIBUTE_SQUOTE_STATE_2, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("'", ATTRIBUTE_SQUOTE_STATE_3, StorageType.DONT_STORE_INPUT, EMIT_ATTRIBUTE_VALUE);
+      addState (COMMENT_STATE_5)
+              .onAnyInput(COMMENT_BODY_STATE, CAPTURE, NO_EMIT)
+              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_COMMENT);
 
-      addState(ATTRIBUTE_SQUOTE_STATE_3, END_OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_CLOSE_QUOTE);
+      addState (PROLOG_STATE)
+              .onAnyInput(PROLOG_STATE, CAPTURE, NO_EMIT)
+              .onInput("?", END_PROLOG_STATE, CAPTURE, NO_EMIT);
 
-      addState(ATTRIBUTE_DQUOTE_STATE_1, ATTRIBUTE_DQUOTE_STATE_2, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_OPEN_QUOTE);
+      addState (END_PROLOG_STATE)
+              .onAnyInput(PROLOG_STATE, CAPTURE, NO_EMIT)
+              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_SPECIAL_ELEMENT);
 
-      addState(ATTRIBUTE_DQUOTE_STATE_2, ATTRIBUTE_DQUOTE_STATE_2, StorageType.STORE_INPUT_BEFORE_EMIT, NO_EMIT)
-              .addAction ("'\"", ATTRIBUTE_DQUOTE_STATE_3, StorageType.DONT_STORE_INPUT, EMIT_ATTRIBUTE_VALUE);
+      addState (EMPTY_ELEMENT_STATE)
+              .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
+              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_EMPTY_ELEMENT);
 
-      addState(ATTRIBUTE_DQUOTE_STATE_3, END_OPEN_ELEMENT_STATE, StorageType.STORE_INPUT_BEFORE_EMIT, EMIT_CLOSE_QUOTE);
+      addState (ATTRIBUTE_NAME_STATE)
+              .onAnyInput(ATTRIBUTE_NAME_STATE, CAPTURE, NO_EMIT)
+              .onInput(">", END_OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_NAME)
+              .onInput(WHITESPACE + "=", ATTRIBUTE_EQ_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_NAME);
+
+      addState (ATTRIBUTE_EQ_STATE)
+              .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
+              .onInput("=", ATTRIBUTE_EQ_STATE, CAPTURE, NO_EMIT)
+              .onInput("'", ATTRIBUTE_OPEN_SQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_EQ)
+              .onInput("\"", ATTRIBUTE_OPEN_DQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_EQ)
+              .onInput(WHITESPACE, ATTRIBUTE_EQ_STATE, CAPTURE, NO_EMIT);
+
+      addState (ATTRIBUTE_OPEN_SQUOTE_STATE)
+              .onAnyInput(ATTRIBUTE_SQUOTE_BODY, CAPTURE, EMIT_OPEN_QUOTE);
+
+      addState (ATTRIBUTE_SQUOTE_BODY)
+              .onAnyInput(ATTRIBUTE_SQUOTE_BODY, CAPTURE, NO_EMIT)
+              .onInput("'", ATTRIBUTE_CLOSE_SQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_VALUE);
+
+      addState (ATTRIBUTE_CLOSE_SQUOTE_STATE)
+              .onAnyInput(END_OPEN_ELEMENT_STATE, CAPTURE, EMIT_CLOSE_QUOTE);
+
+      addState (ATTRIBUTE_OPEN_DQUOTE_STATE)
+              .onAnyInput(ATTRIBUTE_DQUOTE_BODY, CAPTURE, EMIT_OPEN_QUOTE);
+
+      addState (ATTRIBUTE_DQUOTE_BODY)
+              .onAnyInput(ATTRIBUTE_DQUOTE_BODY, CAPTURE, NO_EMIT)
+              .onInput("'\"", ATTRIBUTE_CLOSE_DQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_VALUE);
+
+      addState (ATTRIBUTE_CLOSE_DQUOTE_STATE)
+              .onAnyInput(END_OPEN_ELEMENT_STATE, CAPTURE, EMIT_CLOSE_QUOTE);
 
     } catch (Exception exc) {
-      // need to handle duplicate input and duplicate state
+      // XXX need to handle duplicate input and duplicate state
     }
   }
 

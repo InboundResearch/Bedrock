@@ -8,13 +8,33 @@ public class XmlScannerTest extends XmlScanner {
   private static final Logger log = LogManager.getLogger (XmlScannerTest.class);
 
   @Test
-  public void testXmlScanner1 () {
-    scan ("<xml>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+  public void testXmlScannerProlog () {
+    scanString("<?xml blah blah ?><xml>Fish<!-- comment --> <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
   }
 
   @Test
-  public void testXmlScanner2 () {
-    scan ("<xml /x>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+  public void testXmlScannerComment () {
+    scanString("<xml>Fish<!-- comment --> <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+  }
+
+  @Test
+  public void testXmlScannerComment2 () {
+    scanString("<xml>Fish<!-- comment <blah x=\"hello\" jar = 'xxx' />Shark --></xml>");
+  }
+
+  @Test
+  public void testXmlScanner () {
+    scanString("<xml>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+  }
+
+  @Test
+  public void testXmlScannerError () {
+    scanString("<xml /x>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+  }
+
+  @Test
+  public void testXmlScannerDecl () {
+    scanString("<xml><!DOCTYPE blah blah \"xxx\">Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
   }
 
   @Override

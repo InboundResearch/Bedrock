@@ -11,63 +11,36 @@ public abstract class Scanner {
   protected int offset;
 
   protected static final String DEFAULT_START_STATE_NAME = "start";
+  protected final static String ERROR_STATE = "error";
+  protected final static String EMIT_ERROR = "error";
 
   public Scanner (String startStateName) {
+    states = new HashMap<String, State>();
     this.startStateName = startStateName;
-    resetScanner();
   }
 
   public Scanner () {
     this (DEFAULT_START_STATE_NAME);
   }
 
-  public Scanner addState(State state) throws DuplicateStateException {
-    var stateName = state.getName();
+  public State addState(String stateName) throws DuplicateStateException {
     if (states.containsKey(stateName)) {
       throw new DuplicateStateException(stateName);
     }
-    states.put (state.getName(), state);
-    return this;
+    var state = new State(stateName);
+    states.put (stateName, state);
+    return state;
   }
 
-  public Scanner setCurrentState (String stateName) {
-    currentStateName = stateName;
-    return this;
-  }
-
-  public Scanner resetScanner () {
-    states = new HashMap<String, State>();
-    return reset();
-  }
-
-  public Scanner reset () {
-    currentToken = "";
-    offset = 0;
-    return setCurrentState(startStateName);
-  }
-
-  public String getStartStateName () {
-    return startStateName;
-  }
-
-  public State getState(String stateName) {
-    return states.get(stateName);
-  }
-
-  public State getStartState () {
-    return getState(startStateName);
-  }
-
-  public void handleInput(char input) {
+  public void scanChar(char input) {
     // get the current state
     var currentState = states.get(currentStateName);
 
     // get the action for the input from the current state
-    var action = currentState.getScannerAction(input);
+    var action = currentState.getAction(input);
     if (action != null) {
-      // if we should store the input to the token before emitting...
-      var storage = action.getStorage();
-      if (storage == StorageType.STORE_INPUT_BEFORE_EMIT) {
+      // if we should capture the input...
+      if (action.getCapture()) {
         currentToken += input;
         ++offset;
       }
@@ -80,21 +53,17 @@ public abstract class Scanner {
         currentToken = "";
       }
 
-      // if we should store the input to the token after emitting...
-      if (storage == StorageType.STORE_INPUT_AFTER_EMIT) {
-        currentToken += input;
-        ++offset;
-      }
-
       // advance to the next state
       currentStateName = nextStateName;
     }
   }
 
-  public Scanner scan(String input) {
-    reset();
+  public Scanner scanString(String input) {
+    currentToken = "";
+    currentStateName = startStateName;
+    offset = 0;
     while (offset < input.length ()) {
-      handleInput(input.charAt(offset));
+      scanChar(input.charAt(offset));
     }
     return this;
   }

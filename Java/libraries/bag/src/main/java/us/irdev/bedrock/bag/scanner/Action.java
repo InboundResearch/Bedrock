@@ -3,25 +3,21 @@ package us.irdev.bedrock.bag.scanner;
 public class Action {
 
   private final String nextState;
-  private final StorageType storage;
+  private final boolean capture;
   private final String emit;
 
-  public Action (String nextState, StorageType storage, String emit) {
+  public Action (String nextState, boolean capture, String emit) {
     this.nextState = nextState;
-    this.storage = storage;
+    this.capture = capture;
     this.emit = emit;
-  }
-
-  public Action (String nextState, StorageType storage) {
-    this (nextState, storage, null);
   }
 
   public String getNextState () {
     return nextState;
   }
 
-  public StorageType getStorage () {
-    return storage;
+  public boolean getCapture() {
+    return capture;
   }
 
   public String getEmit () {
