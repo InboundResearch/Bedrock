@@ -4,41 +4,41 @@ import org.junit.jupiter.api.Test;
 import us.irdev.bedrock.logger.LogManager;
 import us.irdev.bedrock.logger.Logger;
 
-public class XmlScannerTest extends XmlScanner {
+public class XmlScannerTest implements Receiver {
   private static final Logger log = LogManager.getLogger (XmlScannerTest.class);
 
   @Test
   public void testXmlScannerProlog () {
-    scanString("<?xml blah blah ?><xml>Fish<!-- comment --> <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+    new XmlScanner().scanString("<?xml blah blah ?><xml>Fish<!-- comment --> <blah x=\"hello\" jar = 'xxx' />Shark</xml>", this);
   }
 
   @Test
   public void testXmlScannerComment () {
-    scanString("<xml>Fish<!-- comment --> <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+    new XmlScanner().scanString("<xml>Fish<!-- comment --> <blah x=\"hello\" jar = 'xxx' />Shark</xml>", this);
   }
 
   @Test
   public void testXmlScannerComment2 () {
-    scanString("<xml>Fish<!-- comment <blah x=\"hello\" jar = 'xxx' />Shark --></xml>");
+    new XmlScanner().scanString("<xml>Fish<!-- comment <blah x=\"hello\" jar = 'xxx' />Shark --></xml>", this);
   }
 
   @Test
   public void testXmlScanner () {
-    scanString("<xml>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+    new XmlScanner().scanString("<xml>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>", this);
   }
 
   @Test
   public void testXmlScannerError () {
-    scanString("<xml /x>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+    new XmlScanner().scanString("<xml /x>Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>", this);
   }
 
   @Test
   public void testXmlScannerDecl () {
-    scanString("<xml><!DOCTYPE blah blah \"xxx\">Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>");
+    new XmlScanner().scanString("<?xml?><!DOCTYPE HTML blah \"xxx\">Fish <blah x=\"hello\" jar = 'xxx' />Shark</xml>", this);
   }
 
   @Override
-  public void emit(String actionEmit, String token, String nextStateName) {
-    log.info (actionEmit + ": (" + token + ") -> " + nextStateName);
+  public void handleToken(Token token) {
+    log.info (token.action() + " (" + token.value() + "), " + token.currentStateName() + " -> " + token.nextStateName());
   }
 }

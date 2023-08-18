@@ -45,7 +45,7 @@ public class XmlScanner extends Scanner {
   private static final String EMIT_BEGIN_CLOSE_ELEMENT = "begin-close-element";
   private static final String EMIT_CLOSE_ELEMENT = "close-element";
   private static final String EMIT_END_CLOSE_ELEMENT = "end-close-element";
-  private static final String EMIT_SPECIAL_ELEMENT = "special-element";
+  private static final String EMIT_PROLOG = "prolog";
   private static final String EMIT_DECL = "decl";
   private static final String EMIT_COMMENT = "comment";
   private static final String EMIT_EMPTY_ELEMENT = "empty-element";
@@ -66,17 +66,17 @@ public class XmlScanner extends Scanner {
 
       addState (DEFAULT_STATE)
               .onAnyInput(BODY_STATE, CAPTURE, NO_EMIT)
-              .onInput("<", BEGIN_OPEN_ELEMENT_STATE, CAPTURE, NO_EMIT);
+              .onInput('<', BEGIN_OPEN_ELEMENT_STATE, CAPTURE, NO_EMIT);
 
       addState (BODY_STATE)
               .onAnyInput(BODY_STATE, CAPTURE, NO_EMIT)
-              .onInput("<", DEFAULT_STATE, DONT_CAPTURE, EMIT_BODY);
+              .onInput('<', DEFAULT_STATE, DONT_CAPTURE, EMIT_BODY);
 
       addState (BEGIN_OPEN_ELEMENT_STATE)
               .onAnyInput(OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_BEGIN_OPEN_ELEMENT)
-              .onInput("/", CLOSE_ELEMENT_STATE, CAPTURE, EMIT_BEGIN_CLOSE_ELEMENT)
-              .onInput("?", PROLOG_STATE, CAPTURE, NO_EMIT)
-              .onInput("!", DECL_START_STATE, CAPTURE, NO_EMIT);
+              .onInput('/', CLOSE_ELEMENT_STATE, CAPTURE, EMIT_BEGIN_CLOSE_ELEMENT)
+              .onInput('?', PROLOG_STATE, CAPTURE, NO_EMIT)
+              .onInput('!', DECL_START_STATE, CAPTURE, NO_EMIT);
 
       addState (OPEN_ELEMENT_STATE)
               .onAnyInput(OPEN_ELEMENT_STATE, CAPTURE, NO_EMIT)
@@ -85,64 +85,64 @@ public class XmlScanner extends Scanner {
 
       addState (END_OPEN_ELEMENT_STATE)
               .onAnyInput(ATTRIBUTE_NAME_STATE, CAPTURE, NO_EMIT)
-              .onInput("/", EMPTY_ELEMENT_STATE, CAPTURE, NO_EMIT)
-              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_END_OPEN_ELEMENT)
+              .onInput('/', EMPTY_ELEMENT_STATE, CAPTURE, NO_EMIT)
+              .onInput('>', DEFAULT_STATE, CAPTURE, EMIT_END_OPEN_ELEMENT)
               .onInput(WHITESPACE, END_OPEN_ELEMENT_STATE, CAPTURE, EMIT_WHITESPACE);
 
       addState (CLOSE_ELEMENT_STATE)
               .onAnyInput(CLOSE_ELEMENT_STATE, CAPTURE, NO_EMIT)
-              .onInput(">", END_CLOSE_ELEMENT_STATE, DONT_CAPTURE, EMIT_CLOSE_ELEMENT);
+              .onInput('>', END_CLOSE_ELEMENT_STATE, DONT_CAPTURE, EMIT_CLOSE_ELEMENT);
 
       addState (END_CLOSE_ELEMENT_STATE)
               .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
-              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_END_CLOSE_ELEMENT);
+              .onInput('>', DEFAULT_STATE, CAPTURE, EMIT_END_CLOSE_ELEMENT);
 
       addState (DECL_START_STATE)
               .onAnyInput(DECL_BODY_STATE, DONT_CAPTURE, NO_EMIT)
-              .onInput("-", COMMENT_STATE_2, CAPTURE, NO_EMIT);
+              .onInput('-', COMMENT_STATE_2, CAPTURE, NO_EMIT);
 
       addState (DECL_BODY_STATE)
               .onAnyInput(DECL_BODY_STATE, CAPTURE, NO_EMIT)
-              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_DECL);
+              .onInput('>', DEFAULT_STATE, CAPTURE, EMIT_DECL);
 
       addState (COMMENT_STATE_2)
               .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
-              .onInput("-", COMMENT_BODY_STATE, CAPTURE, NO_EMIT);
+              .onInput('-', COMMENT_BODY_STATE, CAPTURE, NO_EMIT);
 
       addState (COMMENT_BODY_STATE)
               .onAnyInput(COMMENT_BODY_STATE, CAPTURE, NO_EMIT)
-              .onInput("-", COMMENT_STATE_4, CAPTURE, NO_EMIT);
+              .onInput('-', COMMENT_STATE_4, CAPTURE, NO_EMIT);
 
       addState (COMMENT_STATE_4)
               .onAnyInput(COMMENT_BODY_STATE, CAPTURE, NO_EMIT)
-              .onInput("-", COMMENT_STATE_5, CAPTURE, NO_EMIT);
+              .onInput('-', COMMENT_STATE_5, CAPTURE, NO_EMIT);
 
       addState (COMMENT_STATE_5)
               .onAnyInput(COMMENT_BODY_STATE, CAPTURE, NO_EMIT)
-              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_COMMENT);
+              .onInput('>', DEFAULT_STATE, CAPTURE, EMIT_COMMENT);
 
       addState (PROLOG_STATE)
               .onAnyInput(PROLOG_STATE, CAPTURE, NO_EMIT)
-              .onInput("?", END_PROLOG_STATE, CAPTURE, NO_EMIT);
+              .onInput('?', END_PROLOG_STATE, CAPTURE, NO_EMIT);
 
       addState (END_PROLOG_STATE)
               .onAnyInput(PROLOG_STATE, CAPTURE, NO_EMIT)
-              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_SPECIAL_ELEMENT);
+              .onInput('>', DEFAULT_STATE, CAPTURE, EMIT_PROLOG);
 
       addState (EMPTY_ELEMENT_STATE)
               .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
-              .onInput(">", DEFAULT_STATE, CAPTURE, EMIT_EMPTY_ELEMENT);
+              .onInput('>', DEFAULT_STATE, CAPTURE, EMIT_EMPTY_ELEMENT);
 
       addState (ATTRIBUTE_NAME_STATE)
               .onAnyInput(ATTRIBUTE_NAME_STATE, CAPTURE, NO_EMIT)
-              .onInput(">", END_OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_NAME)
+              .onInput('>', END_OPEN_ELEMENT_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_NAME)
               .onInput(WHITESPACE + "=", ATTRIBUTE_EQ_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_NAME);
 
       addState (ATTRIBUTE_EQ_STATE)
               .onAnyInput(ERROR_STATE, CAPTURE, EMIT_ERROR)
-              .onInput("=", ATTRIBUTE_EQ_STATE, CAPTURE, NO_EMIT)
-              .onInput("'", ATTRIBUTE_OPEN_SQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_EQ)
-              .onInput("\"", ATTRIBUTE_OPEN_DQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_EQ)
+              .onInput('=', ATTRIBUTE_EQ_STATE, CAPTURE, NO_EMIT)
+              .onInput('\'', ATTRIBUTE_OPEN_SQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_EQ)
+              .onInput('"', ATTRIBUTE_OPEN_DQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_EQ)
               .onInput(WHITESPACE, ATTRIBUTE_EQ_STATE, CAPTURE, NO_EMIT);
 
       addState (ATTRIBUTE_OPEN_SQUOTE_STATE)
@@ -150,7 +150,7 @@ public class XmlScanner extends Scanner {
 
       addState (ATTRIBUTE_SQUOTE_BODY)
               .onAnyInput(ATTRIBUTE_SQUOTE_BODY, CAPTURE, NO_EMIT)
-              .onInput("'", ATTRIBUTE_CLOSE_SQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_VALUE);
+              .onInput('\'', ATTRIBUTE_CLOSE_SQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_VALUE);
 
       addState (ATTRIBUTE_CLOSE_SQUOTE_STATE)
               .onAnyInput(END_OPEN_ELEMENT_STATE, CAPTURE, EMIT_CLOSE_QUOTE);
@@ -160,18 +160,14 @@ public class XmlScanner extends Scanner {
 
       addState (ATTRIBUTE_DQUOTE_BODY)
               .onAnyInput(ATTRIBUTE_DQUOTE_BODY, CAPTURE, NO_EMIT)
-              .onInput("'\"", ATTRIBUTE_CLOSE_DQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_VALUE);
+              .onInput('"', ATTRIBUTE_CLOSE_DQUOTE_STATE, DONT_CAPTURE, EMIT_ATTRIBUTE_VALUE);
 
       addState (ATTRIBUTE_CLOSE_DQUOTE_STATE)
               .onAnyInput(END_OPEN_ELEMENT_STATE, CAPTURE, EMIT_CLOSE_QUOTE);
 
     } catch (Exception exc) {
-      // XXX need to handle duplicate input and duplicate state
+      // XXX need to handle duplicate input and duplicate state exceptions - though handling these
+      // XXX would be most important when designing the language parser and not during normal use
     }
-  }
-
-  @Override
-  public void emit (String actionEmit, String token, String nextStateName) {
-
   }
 }

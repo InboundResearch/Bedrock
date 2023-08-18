@@ -4,15 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class State {
-  static class InputAction {
-    char input;
-    Action action;
-
-    InputAction (char input, Action action) {
-      this.input = input;
-      this.action = action;
-    }
-  }
+  record InputAction (char input, Action action) {}
 
   private final String name;
   private final List<InputAction> inputActions;
@@ -55,7 +47,7 @@ public class State {
 
   public State (String name) {
     this.name = name;
-    inputActions = new ArrayList<InputAction>();
+    inputActions = new ArrayList<>();
   }
 
   public String getName () {
