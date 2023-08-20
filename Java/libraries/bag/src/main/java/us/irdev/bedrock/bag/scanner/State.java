@@ -3,12 +3,11 @@ package us.irdev.bedrock.bag.scanner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class State {
-  record InputAction (char input, Action action) {}
+public class State<StateIdType, EmitTokenType> {
+  record InputAction<StateIdType, EmitTokenType> (char input, Action<StateIdType, EmitTokenType> action) {}
 
-  private final String name;
-  private final List<InputAction> inputActions;
-  private Action defaultAction;
+  private final List<InputAction<StateIdType, EmitTokenType>> inputActions;
+  private Action<StateIdType, EmitTokenType> defaultAction;
 
   // XXX if only Java generics could actually be applied generically to base types too
   private int binarySearch (char key) {
@@ -23,7 +22,7 @@ public class State {
       var mid = (low + high) >>> 1;
 
       // the entire reason this has its own custom binary search function is that Java
-      // generics don't capture the need to search inside a complex object like this without a big
+      // generics don't captureInput the need to search inside a complex object like this without a big
       // boxing/unboxing penalty
       var cmp = inputActions.get(mid).input - key;
 
@@ -45,16 +44,11 @@ public class State {
     return -(low + 1);
   }
 
-  public State (String name) {
-    this.name = name;
+  public State () {
     inputActions = new ArrayList<>();
   }
 
-  public String getName () {
-    return name;
-  }
-
-  public Action getAction (char input) {
+  public Action<StateIdType, EmitTokenType> getAction (char input) {
     int index;
     if ((index = binarySearch(input)) >= 0){
       return inputActions.get(index).action;
@@ -62,33 +56,33 @@ public class State {
     return defaultAction;
   }
 
-  public State onInput(char input, Action action) throws DuplicateInputException {
+  public State<StateIdType, EmitTokenType> onInput(char input, Action<StateIdType, EmitTokenType> action) throws DuplicateInputException {
     int index;
     if ((index = binarySearch(input)) < 0) {
-      inputActions.add (-(index + 1), new InputAction(input, action));
+      inputActions.add (-(index + 1), new InputAction<>(input, action));
     } else {
       throw new DuplicateInputException (input);
     }
     return this;
   }
 
-  public State onInput(char input, String nextState, boolean capture, String emit) throws DuplicateInputException {
-    return onInput(input, new Action (nextState, capture, emit));
+  public State<StateIdType, EmitTokenType> onInput(char input, StateIdType nextStateId, boolean capture, EmitTokenType emitToken) throws DuplicateInputException {
+    return onInput(input, new Action<> (nextStateId, capture, emitToken));
   }
 
-  public State onInput(String inputs, Action action) throws DuplicateInputException {
+  public State<StateIdType, EmitTokenType> onInput(String inputs, Action<StateIdType, EmitTokenType> action) throws DuplicateInputException {
     for (int i = 0; i < inputs.length(); ++i) {
       onInput(inputs.charAt(i), action);
     }
     return this;
   }
 
-  public State onInput(String inputs, String nextState, boolean capture, String emit) throws DuplicateInputException {
-    return onInput (inputs, new Action (nextState, capture, emit));
+  public State<StateIdType, EmitTokenType> onInput(String inputs, StateIdType nextStateId, boolean capture, EmitTokenType emitToken) throws DuplicateInputException {
+    return onInput (inputs, new Action<> (nextStateId, capture, emitToken));
   }
 
-  public State onAnyInput(String nextState, boolean capture, String emit) {
-    defaultAction = new Action (nextState, capture, emit);
+  public State<StateIdType, EmitTokenType> onAnyInput(StateIdType nextStateId, boolean capture, EmitTokenType emitToken) {
+    defaultAction = new Action<> (nextStateId, capture, emitToken);
     return this;
   }
 }

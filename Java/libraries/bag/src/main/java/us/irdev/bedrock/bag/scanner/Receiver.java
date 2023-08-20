@@ -1,5 +1,5 @@
 package us.irdev.bedrock.bag.scanner;
 
-public interface Receiver {
-    void handleToken (Token token);
+public interface Receiver<EmitTokenType> {
+    void handleToken (Token<EmitTokenType> token);
 }

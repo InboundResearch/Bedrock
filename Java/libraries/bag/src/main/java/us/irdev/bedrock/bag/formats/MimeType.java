@@ -15,6 +15,7 @@ public class MimeType {
 
     public static final String JSON = "application/json";
     public static final String XML = "application/xml";
+    public static final String HTML = "text/html";
     public static final String CSV = "text/csv";
     public static final String URL = "application/x-www-form-urlencoded";
     public static final String TEXT = "application/text";

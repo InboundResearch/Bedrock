@@ -1,3 +1,3 @@
 package us.irdev.bedrock.bag.scanner;
 
-public record Action(String nextState, boolean capture, String emit) { }
+public record Action<StateIdType, EmitTokenType>(StateIdType nextStateId, boolean captureInput, EmitTokenType emitToken) { }

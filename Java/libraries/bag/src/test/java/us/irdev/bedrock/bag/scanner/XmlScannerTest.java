@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import us.irdev.bedrock.logger.LogManager;
 import us.irdev.bedrock.logger.Logger;
 
-public class XmlScannerTest implements Receiver {
+public class XmlScannerTest implements Receiver<XmlToken> {
   private static final Logger log = LogManager.getLogger (XmlScannerTest.class);
 
   @Test
@@ -38,7 +38,7 @@ public class XmlScannerTest implements Receiver {
   }
 
   @Override
-  public void handleToken(Token token) {
-    log.info (token.action() + " (" + token.value() + "), " + token.currentStateName() + " -> " + token.nextStateName());
+  public void handleToken(Token<XmlToken> token) {
+    log.info (token.emitToken() + " (" + token.value() + ")");
   }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE node>
+<node>
+    <!-- a comment -->
+    <steps>
+        <step>one</step>
+        <step>two</step>
+        <step>three</step>
+    </steps>
+    <obj abc="123" xyz="yes" />
+    <obj abc="456" xyz="no">object</obj>
+</node>

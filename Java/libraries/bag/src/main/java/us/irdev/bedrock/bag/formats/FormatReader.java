@@ -100,7 +100,8 @@ public class FormatReader {
                 FormatReaderComposite.class,
                 FormatReaderDelimited.class,
                 FormatReaderJson.class,
-                FormatReaderTable.class
+                FormatReaderTable.class,
+                FormatReaderXml.class
         };
         for (var type : formatReaders) {
             try {

@@ -228,7 +228,7 @@ public class FormatReaderParsed extends FormatReader {
         var result = (String) null;
         var start = consumeUntil (stopChars, true);
 
-        // capture the result if we actually consumed some characters
+        // captureInput the result if we actually consumed some characters
         if (index > start) {
             result = input.substring (start, index);
         }
@@ -241,7 +241,7 @@ public class FormatReaderParsed extends FormatReader {
         var result = (String) null;
         var start = consumeWhile (inChars, false);
 
-        // capture the result if we actually consumed some characters
+        // captureInput the result if we actually consumed some characters
         if (index > start) {
             result = input.substring (start, index);
         }

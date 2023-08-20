@@ -25,7 +25,7 @@ public class FormatWriterJson extends FormatWriter {
                 // "objectify" method will gate that
             }
         }
-        // if we stored a null, we need to emit it as a value. This will only happen in the
+        // if we stored a null, we need to emitToken it as a value. This will only happen in the
         // array types, and is handled on the parsing side with a special case for reading
         // the bare value 'null' (not quoted)
         return "null";

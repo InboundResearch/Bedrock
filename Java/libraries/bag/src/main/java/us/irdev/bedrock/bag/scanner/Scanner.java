@@ -3,64 +3,59 @@ package us.irdev.bedrock.bag.scanner;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Scanner {
-  protected Map<String, State> states;
-  private final String startStateName;
-  protected String currentStateName;
+public class Scanner<StateIdType, EmitTokenType> {
+  protected Map<StateIdType, State<StateIdType, EmitTokenType>> states;
+  private final StateIdType startStateId;
+  protected StateIdType currentStateId;
   private String currentToken;
   protected String input;
   protected int offset;
 
-  protected static final String DEFAULT_START_STATE_NAME = "start";
-  protected final static String ERROR_STATE = "error";
-  protected final static String EMIT_ERROR = "error";
+  protected static final boolean CAPTURE = true;
+  protected static final boolean DONT_CAPTURE = false;
 
-  public Scanner (String startStateName) {
+
+  public Scanner (StateIdType startStateId) {
     states = new HashMap<>();
-    this.startStateName = startStateName;
+    this.startStateId = startStateId;
   }
 
-  public Scanner () {
-    this (DEFAULT_START_STATE_NAME);
-  }
-
-  public State addState(String stateName) throws DuplicateStateException {
-    if (states.containsKey(stateName)) {
-      throw new DuplicateStateException(stateName);
+  public State<StateIdType, EmitTokenType> addState(StateIdType stateId) throws DuplicateStateException {
+    if (states.containsKey(stateId)) {
+      throw new DuplicateStateException(stateId.toString());
     }
-    var state = new State(stateName);
-    states.put (stateName, state);
+    var state = new State<StateIdType, EmitTokenType>();
+    states.put (stateId, state);
     return state;
   }
 
-  public Token scanChar(char input) {
+  public Token<EmitTokenType> scanChar(char input) {
     // set up to receive the result
-    Token result = null;
+    Token<EmitTokenType> result = null;
 
     // get the current state
-    var currentState = states.get(currentStateName);
+    var currentState = states.get(currentStateId);
 
     // get the action for the input from the current state
     var action = currentState.getAction(input);
     if (action != null) {
-      // capture the next state
-      var nextStateName = action.nextState();
+      // advance to the next state
+      currentStateId = action.nextStateId();
 
       // if we should capture the input...
-      if (action.capture()) {
+      if (action.captureInput()) {
         currentToken += input;
         ++offset;
       }
 
-      // if we should emit...
-      var actionEmit = action.emit();
-      if (actionEmit != null) {
-        result = new Token (currentStateName, actionEmit, currentToken, nextStateName);
+      // if we should emit a token...
+      var emitToken = action.emitToken();
+      if (emitToken != null) {
+        result = new Token<> (emitToken, currentToken);
+
+        // reset the current token
         currentToken = "";
       }
-
-      // advance to the next state
-      currentStateName = nextStateName;
     }
 
     // return the token result of the scan (if any)
@@ -70,11 +65,11 @@ public class Scanner {
   public void start (String input) {
     this.input = input;
     currentToken = "";
-    currentStateName = startStateName;
+    currentStateId = startStateId;
     offset = 0;
   }
 
-  public Token scanToken() {
+  public Token<EmitTokenType> scanToken() {
     while (offset < input.length ()) {
       var token = scanChar(input.charAt(offset));
       if (token != null) {
@@ -85,9 +80,9 @@ public class Scanner {
     return null;
   }
 
-  public void scanString(String input, Receiver receiver) {
+  public void scanString(String input, Receiver<EmitTokenType> receiver) {
     start (input);
-    Token token;
+    Token<EmitTokenType> token;
     while ((token = scanToken()) != null) {
       receiver.handleToken(token);
     }
