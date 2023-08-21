@@ -19,18 +19,33 @@ public class FormatReaderXmlTest {
         assertNotNull (bagObject);
         assertEquals (bagObject.getString(FormatReaderXml._ELEMENT), "node");
         bagArray = bagObject.getBagArray(FormatReaderXml._CHILDREN);
+
         bagObject = bagArray.getBagObject(0);
         assertNotNull (bagObject);
         assertEquals (bagObject.getString(FormatReaderXml._ELEMENT), "steps");
         var steps = bagObject.getBagArray(FormatReaderXml._CHILDREN);
         assertEquals(steps.getCount (), 3);
+        bagObject = steps.getBagObject(0);
+        assertEquals(bagObject.getString(FormatReaderXml._ELEMENT), "step");
+        assertEquals(bagObject.getString(FormatReaderXml._BODY), "one");
+        bagObject = steps.getBagObject(1);
+        assertEquals(bagObject.getString(FormatReaderXml._ELEMENT), "step");
+        assertEquals(bagObject.getString(FormatReaderXml._BODY), "two");
+        bagObject = steps.getBagObject(2);
+        assertEquals(bagObject.getString(FormatReaderXml._ELEMENT), "step");
+        assertEquals(bagObject.getString(FormatReaderXml._BODY), "three");
+
+
         bagObject = bagArray.getBagObject(1);
         assertNotNull (bagObject);
         assertEquals (bagObject.getString(FormatReaderXml._ELEMENT), "obj");
         assertEquals (bagObject.getString("abc"), "123");
+        assertEquals (bagObject.getString("xyz"), "yes");
+
         bagObject = bagArray.getBagObject(2);
         assertNotNull (bagObject);
         assertEquals (bagObject.getString(FormatReaderXml._ELEMENT), "obj");
+        assertEquals (bagObject.getString("abc"), "456");
         assertEquals (bagObject.getString("xyz"), "no");
     }
 
