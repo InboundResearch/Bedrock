@@ -38,10 +38,11 @@ public class XmlScanner extends Scanner<XmlState, XmlToken> {
 
       addState (XmlState.CLOSE_ELEMENT)
               .onAnyInput(XmlState.CLOSE_ELEMENT, CAPTURE, NO_EMIT)
-              .onInput('>', XmlState.END_CLOSE_ELEMENT, DONT_CAPTURE, XmlToken.CLOSE_ELEMENT_NAME);
+              .onInput(WHITESPACE + '>', XmlState.END_CLOSE_ELEMENT, DONT_CAPTURE, XmlToken.CLOSE_ELEMENT_NAME);
 
       addState (XmlState.END_CLOSE_ELEMENT)
               .onAnyInput(XmlState.ERROR, CAPTURE, XmlToken.ERROR)
+              .onInput(WHITESPACE, XmlState.END_CLOSE_ELEMENT, CAPTURE, XmlToken.WHITESPACE)
               .onInput('>', XmlState.START, CAPTURE, XmlToken.END_CLOSE_ELEMENT);
 
       addState (XmlState.DECL_START)

@@ -27,13 +27,14 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private XmlScanner scanner;
   private Token<XmlToken> currentToken;
 
-  private static final String _ELEMENT = "_element";
-  private static final String _BODY = "_body";
-  private static final String _CHILDREN = "_children";
+  public static final String _ELEMENT = "_element";
+  public static final String _BODY = "_body";
+  public static final String _CHILDREN = "_children";
 
-  private static final Set<XmlToken> IGNORE = Stream.of(
-          XmlToken.COMMENT, XmlToken.BODY, XmlToken.DECL, XmlToken.PROLOG
-  ).collect(Collectors.toUnmodifiableSet());
+  private static final Set<XmlToken> IGNORE_TOP_LEVEL = Stream.of(XmlToken.COMMENT, XmlToken.BODY, XmlToken.DECL, XmlToken.PROLOG).collect(Collectors.toUnmodifiableSet());
+  private static final Set<XmlToken> IGNORE_IN_BODY = Stream.of(XmlToken.COMMENT, XmlToken.DECL, XmlToken.PROLOG).collect(Collectors.toUnmodifiableSet());
+  private static final Set<XmlToken> IGNORE_WHITESPACE = Stream.of(XmlToken.WHITESPACE).collect(Collectors.toUnmodifiableSet());
+
 
   public FormatReaderXml() {}
 
@@ -42,11 +43,10 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
     scanner = new XmlScanner();
   }
 
-  private boolean readToken(XmlToken ignore) {
+  private boolean readToken(Set<XmlToken> ignore) {
     while (true) {
-      currentToken = scanner.scanToken();
       if ((currentToken = scanner.scanToken()) != null) {
-        if (currentToken.emitToken() != ignore) {
+        if ((ignore == null) || (! ignore.contains(currentToken.emitToken()))) {
           return true;
         }
       } else {
@@ -55,52 +55,53 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
     }
   }
 
-  private boolean readToken(Set<XmlToken> ignore) {
-    while (true) {
-      currentToken = scanner.scanToken();
-      if ((currentToken = scanner.scanToken()) != null) {
-        if (! ignore.contains(currentToken.emitToken())) {
-          return true;
-        }
-      } else {
-        return false;
-      }
-    }
+  private boolean readToken() {
+    return readToken(null);
   }
 
   private boolean check(XmlToken token) {
     return (currentToken != null) && (currentToken.emitToken() == token);
   }
 
-  private boolean expect(XmlToken token) {
+  private boolean expect(XmlToken token, Set<XmlToken> ignore) {
     if (check (token)) {
-      readToken();
-      return true;
+      return readToken(ignore);
     } else {
       return false;
     }
   }
 
-  private boolean readAndExpect(XmlToken token) {
-    if (readToken () && (currentToken.emitToken() == token)) {
-      readToken();
-      return true;
-    }
-    return false;
+  private boolean expect(XmlToken token) {
+    return expect(token, null);
   }
 
   private BagObject readBody(BagObject element) {
-    while (readToken() != null) {
-      switch (currentToken.emitToken()) {
-        case BODY -> { element.add(_BODY, currentToken.value()); }
-        case BEGIN_OPEN_ELEMENT -> { element.add(_CHILDREN, readElement ()); }
+    while (readToken ()) {
+      switch (currentToken.emitToken ()) {
+        case COMMENT, DECL, PROLOG -> {
+        }
+        case BODY -> {
+          element.add (_BODY, currentToken.value ());
+        }
+        case BEGIN_OPEN_ELEMENT -> {
+          element.add (_CHILDREN, readElement ());
+        }
         case BEGIN_CLOSE_ELEMENT -> {
-          if ((readToken() != null) && (currentToken.emitToken() == XmlToken.CLOSE_ELEMENT_NAME) &&
-                  (element.getString(_ELEMENT).equals(currentToken.value())) &&
-                  readAndExpect(XmlToken.END_CLOSE_ELEMENT)) {
-            return element;
-          } else {
-            // XXX continue until we get the proper close element?
+          if (readToken () && (currentToken.emitToken () == XmlToken.CLOSE_ELEMENT_NAME)) {
+            // XXX add allow for anonymous close element (via an empty close_element_name)?
+            // XXX it's not strictly allowed in XML, do we care?
+            var elementName = currentToken.value ();
+            if (elementName.equals ("") || element.getString (_ELEMENT).equals (elementName)) {
+              while (readToken () && (currentToken.emitToken () == XmlToken.WHITESPACE)) { }
+              if (currentToken.emitToken () == XmlToken.END_CLOSE_ELEMENT) {
+                return element;
+              } else {
+                // XXX some sort of error?
+              }
+            } else {
+              // continue until we get the proper close element
+              // XXX this could be an error, or it could be some script code insode a script node that has what looks like a close tag...
+            }
           }
         }
       }
@@ -108,48 +109,59 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
     return element;
   }
 
-  private void readAttribute(BagObject element) {
-    if (check(XmlToken.ATTRIBUTE_NAME)) {
+  private boolean readAttribute(BagObject element) {
+    if (currentToken.emitToken() == XmlToken.ATTRIBUTE_NAME){
       var attributeName = currentToken.value();
-      if (readAndExpect(XmlToken.ATTRIBUTE_EQ) && expect(XmlToken.OPEN_QUOTE) && check(XmlToken.ATTRIBUTE_VALUE)) {
+      readToken();
+      if (expect(XmlToken.ATTRIBUTE_EQ) && expect(XmlToken.OPEN_QUOTE) && check(XmlToken.ATTRIBUTE_VALUE)) {
         element.put(attributeName, currentToken.value());
-        readAndExpect(XmlToken.CLOSE_QUOTE);
+        return readToken() && (currentToken.emitToken() == XmlToken.CLOSE_QUOTE);
       }
     }
+    return false;
   }
 
   private BagObject readElement() {
-    if (check(XmlToken.BEGIN_OPEN_ELEMENT) && readToken(XmlToken.WHITESPACE) && (currentToken.emitToken() == XmlToken.OPEN_ELEMENT_NAME)) {
+    if (expect (XmlToken.BEGIN_OPEN_ELEMENT, IGNORE_WHITESPACE) && (currentToken.emitToken() == XmlToken.OPEN_ELEMENT_NAME)) {
       var element = BagObject.open(_ELEMENT, currentToken.value());
-      while (readToken(XmlToken.WHITESPACE)) {
+      while (readToken()) {
         switch(currentToken.emitToken()) {
-          case END_OPEN_ELEMENT -> { return readBody(element); }
+          case END_OPEN_ELEMENT -> {
+            return readBody(element);
+          }
           case EMPTY_ELEMENT -> {
-            readToken(IGNORE);
             return element;
           }
-          case ATTRIBUTE_NAME -> { readAttribute(element); }
+          case ATTRIBUTE_NAME -> {
+            if (! readAttribute(element)) {
+              // XXX ERROR
+              return null;
+            }
+          }
+          case WHITESPACE -> {}
           default -> {
-            // error
+            // XXX error
+            return null;
           }
         }
       }
     }
+    // XXX error
     return null;
   }
 
   public BagArray readBagArray () {
     scanner.start (input);
-    readToken(IGNORE);
 
     BagArray array = null;
-    BagObject element;
-    while ((element = readElement()) != null) {
-      if (array == null) {
-        array = new BagArray();
+    while (readToken()) {
+      if (currentToken.emitToken() == XmlToken.BEGIN_OPEN_ELEMENT) {
+        var element = readElement ();
+        if (array == null) {
+          array = new BagArray();
+        }
+        array.add(element);
       }
-      array.add(element);
-      element = readElement();
     }
     return array;
   }
