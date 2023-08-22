@@ -39,6 +39,6 @@ public class XmlScannerTest implements Receiver<XmlToken> {
 
   @Override
   public void handleToken(Token<XmlToken> token) {
-    log.info (token.emitToken() + " (" + token.value() + ")");
+    log.info (token.toString());
   }
 }

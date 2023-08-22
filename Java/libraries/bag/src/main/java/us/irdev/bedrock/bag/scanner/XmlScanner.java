@@ -26,9 +26,12 @@ public class XmlScanner extends Scanner<XmlState, XmlToken> {
               .onInput('!', XmlState.DECL_START, CAPTURE, NO_EMIT);
 
       addState (XmlState.OPEN_ELEMENT)
-              .onAnyInput(XmlState.OPEN_ELEMENT, CAPTURE, NO_EMIT)
-              .onInput("/>", XmlState.END_OPEN_ELEMENT, DONT_CAPTURE, XmlToken.OPEN_ELEMENT_NAME)
-              .onInput(WHITESPACE, XmlState.END_OPEN_ELEMENT, DONT_CAPTURE, XmlToken.OPEN_ELEMENT_NAME);
+              .onAnyInput(XmlState.OPEN_ELEMENT_NAME, DONT_CAPTURE, NO_EMIT)
+              .onInput(WHITESPACE, XmlState.OPEN_ELEMENT, CAPTURE, XmlToken.WHITESPACE);
+
+      addState (XmlState.OPEN_ELEMENT_NAME)
+              .onAnyInput(XmlState.OPEN_ELEMENT_NAME, CAPTURE, NO_EMIT)
+              .onInput(WHITESPACE + "/>", XmlState.END_OPEN_ELEMENT, DONT_CAPTURE, XmlToken.OPEN_ELEMENT_NAME);
 
       addState (XmlState.END_OPEN_ELEMENT)
               .onAnyInput(XmlState.ATTRIBUTE_NAME, CAPTURE, NO_EMIT)
@@ -37,7 +40,12 @@ public class XmlScanner extends Scanner<XmlState, XmlToken> {
               .onInput(WHITESPACE, XmlState.END_OPEN_ELEMENT, CAPTURE, XmlToken.WHITESPACE);
 
       addState (XmlState.CLOSE_ELEMENT)
-              .onAnyInput(XmlState.CLOSE_ELEMENT, CAPTURE, NO_EMIT)
+              .onAnyInput(XmlState.CLOSE_ELEMENT_NAME, DONT_CAPTURE, NO_EMIT)
+              .onInput(WHITESPACE, XmlState.CLOSE_ELEMENT, CAPTURE, XmlToken.WHITESPACE)
+              .onInput('>', XmlState.END_CLOSE_ELEMENT, DONT_CAPTURE, XmlToken.CLOSE_ELEMENT_ANONYMOUS);
+
+      addState (XmlState.CLOSE_ELEMENT_NAME)
+              .onAnyInput(XmlState.CLOSE_ELEMENT_NAME, CAPTURE, NO_EMIT)
               .onInput(WHITESPACE + '>', XmlState.END_CLOSE_ELEMENT, DONT_CAPTURE, XmlToken.CLOSE_ELEMENT_NAME);
 
       addState (XmlState.END_CLOSE_ELEMENT)
@@ -88,13 +96,14 @@ public class XmlScanner extends Scanner<XmlState, XmlToken> {
 
       addState (XmlState.ATTRIBUTE_EQ)
               .onAnyInput(XmlState.ERROR, CAPTURE, XmlToken.ERROR)
-              .onInput('=', XmlState.ATTRIBUTE_EQ, CAPTURE, NO_EMIT)
-              .onInput('\'', XmlState.ATTRIBUTE_OPEN_SINGLE_QUOTE, DONT_CAPTURE, XmlToken.ATTRIBUTE_EQ)
-              .onInput('"', XmlState.ATTRIBUTE_OPEN_DOUBLE_QUOTE, DONT_CAPTURE, XmlToken.ATTRIBUTE_EQ)
-              .onInput(WHITESPACE, XmlState.ATTRIBUTE_EQ, CAPTURE, NO_EMIT);
+              .onInput('=', XmlState.END_ATTRIBUTE_EQ, CAPTURE, XmlToken.ATTRIBUTE_EQ)
+              .onInput(WHITESPACE, XmlState.ATTRIBUTE_EQ, CAPTURE, XmlToken.WHITESPACE);
 
-      addState (XmlState.ATTRIBUTE_OPEN_SINGLE_QUOTE)
-              .onAnyInput(XmlState.ATTRIBUTE_SINGLE_QUOTE_BODY, CAPTURE, XmlToken.OPEN_QUOTE);
+      addState (XmlState.END_ATTRIBUTE_EQ)
+              .onAnyInput(XmlState.ERROR, CAPTURE, XmlToken.ERROR)
+              .onInput('\'', XmlState.ATTRIBUTE_SINGLE_QUOTE_BODY, CAPTURE, XmlToken.OPEN_QUOTE)
+              .onInput('"', XmlState.ATTRIBUTE_DOUBLE_QUOTE_BODY, CAPTURE, XmlToken.OPEN_QUOTE)
+              .onInput(WHITESPACE, XmlState.END_ATTRIBUTE_EQ, CAPTURE, XmlToken.WHITESPACE);
 
       addState (XmlState.ATTRIBUTE_SINGLE_QUOTE_BODY)
               .onAnyInput(XmlState.ATTRIBUTE_SINGLE_QUOTE_BODY, CAPTURE, NO_EMIT)
@@ -102,9 +111,6 @@ public class XmlScanner extends Scanner<XmlState, XmlToken> {
 
       addState (XmlState.ATTRIBUTE_CLOSE_SINGLE_QUOTE)
               .onAnyInput(XmlState.END_OPEN_ELEMENT, CAPTURE, XmlToken.CLOSE_QUOTE);
-
-      addState (XmlState.ATTRIBUTE_OPEN_DOUBLE_QUOTE)
-              .onAnyInput(XmlState.ATTRIBUTE_DOUBLE_QUOTE_BODY, CAPTURE, XmlToken.OPEN_QUOTE);
 
       addState (XmlState.ATTRIBUTE_DOUBLE_QUOTE_BODY)
               .onAnyInput(XmlState.ATTRIBUTE_DOUBLE_QUOTE_BODY, CAPTURE, NO_EMIT)

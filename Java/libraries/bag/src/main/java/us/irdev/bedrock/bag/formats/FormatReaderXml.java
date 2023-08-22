@@ -5,6 +5,8 @@ import us.irdev.bedrock.bag.BagObject;
 import us.irdev.bedrock.bag.scanner.Token;
 import us.irdev.bedrock.bag.scanner.XmlScanner;
 import us.irdev.bedrock.bag.scanner.XmlToken;
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,17 +26,18 @@ import java.util.stream.Stream;
 //    whatever attributes are defined as key-value pairs within the element open tag
 // 4) error checking is limited
 public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
+  private static final Logger log = LogManager.getLogger (FormatReaderXml.class);
+
   private XmlScanner scanner;
   private Token<XmlToken> currentToken;
 
+  private String error = null;
+
   public static final String _ELEMENT = "_element";
-  public static final String _BODY = "_body";
+  public static final String _CONTENT = "_content";
   public static final String _CHILDREN = "_children";
 
-  private static final Set<XmlToken> IGNORE_TOP_LEVEL = Stream.of(XmlToken.COMMENT, XmlToken.BODY, XmlToken.DECL, XmlToken.PROLOG).collect(Collectors.toUnmodifiableSet());
-  private static final Set<XmlToken> IGNORE_IN_BODY = Stream.of(XmlToken.COMMENT, XmlToken.DECL, XmlToken.PROLOG).collect(Collectors.toUnmodifiableSet());
   private static final Set<XmlToken> IGNORE_WHITESPACE = Stream.of(XmlToken.WHITESPACE).collect(Collectors.toUnmodifiableSet());
-
 
   public FormatReaderXml() {}
 
@@ -43,9 +46,17 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
     scanner = new XmlScanner();
   }
 
+  private void onError(String error) {
+    if (this.error == null) {
+      this.error = error;
+      log.error (error);
+    }
+  }
+
   private boolean readToken(Set<XmlToken> ignore) {
     while (true) {
       if ((currentToken = scanner.scanToken()) != null) {
+        log.info (currentToken.toString());
         if ((ignore == null) || (! ignore.contains(currentToken.emitToken()))) {
           return true;
         }
@@ -81,27 +92,28 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
         case COMMENT, DECL, PROLOG -> {
         }
         case BODY -> {
-          element.add (_BODY, currentToken.value ());
+          element.add (_CONTENT, currentToken.value ());
         }
         case BEGIN_OPEN_ELEMENT -> {
           element.add (_CHILDREN, readElement ());
         }
         case BEGIN_CLOSE_ELEMENT -> {
-          if (readToken () && (currentToken.emitToken () == XmlToken.CLOSE_ELEMENT_NAME)) {
-            // XXX add allow for anonymous close element (via an empty close_element_name)?
-            // XXX it's not strictly allowed in XML, do we care?
-            var elementName = currentToken.value ();
-            if (elementName.equals ("") || element.getString (_ELEMENT).equals (elementName)) {
-              while (readToken () && (currentToken.emitToken () == XmlToken.WHITESPACE)) { }
-              if (currentToken.emitToken () == XmlToken.END_CLOSE_ELEMENT) {
+          if (readToken(IGNORE_WHITESPACE)) {
+            if ((currentToken.emitToken () == XmlToken.CLOSE_ELEMENT_ANONYMOUS) ||
+                    ((currentToken.emitToken () == XmlToken.CLOSE_ELEMENT_NAME) &&
+                            element.getString (_ELEMENT).equals (currentToken.value ()))) {
+              if (readToken(IGNORE_WHITESPACE) && (currentToken.emitToken () == XmlToken.END_CLOSE_ELEMENT)) {
                 return element;
               } else {
-                // XXX some sort of error?
+                // XXX error
+                onError("A");
               }
             } else {
-              // continue until we get the proper close element
-              // XXX this could be an error, or it could be some script code insode a script node that has what looks like a close tag...
+              // XXX error
+              onError("B - " + currentToken.toString() + " (should be '" + element.getString (_ELEMENT) + "')");
             }
+          } else {
+            onError("unexpected end of input");
           }
         }
       }
@@ -110,19 +122,22 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   }
 
   private boolean readAttribute(BagObject element) {
+    // attrname S* = S* ['"] attrvalue ['"]
     if (currentToken.emitToken() == XmlToken.ATTRIBUTE_NAME){
       var attributeName = currentToken.value();
-      readToken();
-      if (expect(XmlToken.ATTRIBUTE_EQ) && expect(XmlToken.OPEN_QUOTE) && check(XmlToken.ATTRIBUTE_VALUE)) {
+      if (readToken(IGNORE_WHITESPACE) && (currentToken.emitToken() == XmlToken.ATTRIBUTE_EQ) &&
+              readToken(IGNORE_WHITESPACE) && (currentToken.emitToken() == XmlToken.OPEN_QUOTE) &&
+              readToken() && (currentToken.emitToken() == XmlToken.ATTRIBUTE_VALUE)) {
         element.put(attributeName, currentToken.value());
         return readToken() && (currentToken.emitToken() == XmlToken.CLOSE_QUOTE);
       }
     }
+    onError("unexpected token while reading attribute");
     return false;
   }
 
   private BagObject readElement() {
-    if (expect (XmlToken.BEGIN_OPEN_ELEMENT, IGNORE_WHITESPACE) && (currentToken.emitToken() == XmlToken.OPEN_ELEMENT_NAME)) {
+    if ((currentToken.emitToken() == XmlToken.BEGIN_OPEN_ELEMENT) && readToken(IGNORE_WHITESPACE) && (currentToken.emitToken() == XmlToken.OPEN_ELEMENT_NAME)) {
       var element = BagObject.open(_ELEMENT, currentToken.value());
       while (readToken()) {
         switch(currentToken.emitToken()) {
@@ -135,18 +150,21 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
           case ATTRIBUTE_NAME -> {
             if (! readAttribute(element)) {
               // XXX ERROR
+              onError("D");
               return null;
             }
           }
           case WHITESPACE -> {}
           default -> {
             // XXX error
+            onError("E");
             return null;
           }
         }
       }
     }
     // XXX error
+    onError("F");
     return null;
   }
 
@@ -167,8 +185,10 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   }
 
   static {
+    MimeType.addExtensionMapping (MimeType.XML, "pom");
     MimeType.addExtensionMapping (MimeType.XML, "xml");
     MimeType.addExtensionMapping (MimeType.HTML, "html");
+    MimeType.addMimeTypeMapping (MimeType.XML, "text/xml");
     FormatReader.registerFormatReader (MimeType.XML, false, FormatReaderXml::new);
     FormatReader.registerFormatReader (MimeType.HTML, false, FormatReaderXml::new);
   }
