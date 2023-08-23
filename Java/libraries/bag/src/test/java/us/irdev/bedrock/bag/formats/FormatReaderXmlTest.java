@@ -61,37 +61,31 @@ public class FormatReaderXmlTest {
     }
 
     @Test
-    public void testFormatReaderXmlWithHtmlFromUrl () {
-        var bagArray = BagArrayFrom.url("https://bedrock.brettonw.com");
+    public void testFormatReaderXmlWithHtmlFromFile () {
+        var bagArray = BagArrayFrom.file (new File("data", "test.html"));
         assertNotNull (bagArray);
-        assertEquals (bagArray.getCount(), 1);
+        assertEquals (bagArray.getCount(), 2);
         var bagObject = bagArray.getBagObject(0);
         assertNotNull (bagObject);
         assertEquals (bagObject.getString(FormatReaderXml._ELEMENT), "html");
         bagArray = bagObject.getBagArray(FormatReaderXml._CHILDREN);
     }
 
-    private static BagArray fetchBagArray (String urlString, String mimeType) {
-        try {
-            var url = URI.create (urlString).toURL();
-            var sourceAdapter = new SourceAdapterHttp (url);
-            if (mimeType != null) {
-                sourceAdapter.setMimeType (mimeType);
-            }
-            return FormatReader.readBagArray (sourceAdapter);
-        } catch (Exception exception) {
-            return null;
-        }
-    }
-
-    private static BagArray fetchBagArray (String urlString) {
-        return fetchBagArray(urlString, null);
+    @Test
+    public void testFormatReaderXmlWithHtmlFromUrl () {
+        var bagArray = BagArrayFrom.url("https://bedrock.brettonw.com");
+        assertNotNull (bagArray);
+        assertEquals (bagArray.getCount(), 2);
+        var bagObject = bagArray.getBagObject(0);
+        assertNotNull (bagObject);
+        assertEquals (bagObject.getString(FormatReaderXml._ELEMENT), "html");
+        bagArray = bagObject.getBagArray(FormatReaderXml._CHILDREN);
     }
 
     @Test
     public void testFormatReaderXmlWithPomFromUrl () {
-        //var bagArray = fetchBagArray("https://raw.githubusercontent.com/InboundResearch/Bedrock/development/Java/pom.xml", MimeType.XML);
-        var bagArray = fetchBagArray("https://repo1.maven.org/maven2/us/irdev/bedrock/bedrock/2.2.6/bedrock-2.2.6.pom");
+        //var bagArray = BagArrayFrom.url("https://raw.githubusercontent.com/InboundResearch/Bedrock/development/Java/pom.xml", MimeType.XML);
+        var bagArray = BagArrayFrom.url("https://repo1.maven.org/maven2/us/irdev/bedrock/bedrock/2.2.6/bedrock-2.2.6.pom");
 
         assertNotNull (bagArray);
         assertEquals (bagArray.getCount(), 1);

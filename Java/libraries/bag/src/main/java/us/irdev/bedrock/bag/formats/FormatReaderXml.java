@@ -26,14 +26,14 @@ import java.util.stream.Stream;
 //    children. we save these in the BagObject as _element, _content, and _children, in addition to
 //    whatever attributes are defined as key-value pairs within the element open tag
 // 4) error checking is limited
-// 5) HTML is not XML - in particular there are some elements that may or may not have close tags
-//    according to the standards (e.g. meta, link, img, br, etc.).
+// 5) HTML is not XML - in particular there are some elements that may or may not have bodies or
+//    close tags according to the standards (e.g. meta, link, img, br, etc.).
 public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private static final Logger log = LogManager.getLogger (FormatReaderXml.class);
 
   private XmlScanner scanner;
   private Token<XmlToken> currentToken;
-
+  private Set<String> voidElements = null;
   private String error = null;
 
   public static final String _ELEMENT = "_element";
@@ -41,12 +41,20 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   public static final String _CHILDREN = "_children";
 
   private static final Set<XmlToken> IGNORE_WHITESPACE = Stream.of(XmlToken.WHITESPACE).collect(Collectors.toUnmodifiableSet());
+  public static final Set<String> HTML_VOID_ELEMENTS = Stream.of(
+          "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr").collect(Collectors.toUnmodifiableSet());
 
   public FormatReaderXml() {}
 
   private FormatReaderXml(String input) {
     super (input);
     scanner = new XmlScanner();
+  }
+
+  private FormatReaderXml(String input, Set<String> voidElements) {
+    super (input);
+    scanner = new XmlScanner();
+    this.voidElements = voidElements;
   }
 
   private void onError(String error) {
@@ -59,7 +67,7 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private boolean readToken(Set<XmlToken> ignore) {
     while (true) {
       if ((currentToken = scanner.scanToken()) != null) {
-        log.info (currentToken.toString());
+        log.debug (currentToken.toString());
         if ((ignore == null) || (! ignore.contains(currentToken.emitToken()))) {
           return true;
         }
@@ -141,11 +149,16 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
 
   private BagObject readElement() {
     if ((currentToken.emitToken() == XmlToken.BEGIN_OPEN_ELEMENT) && readToken(IGNORE_WHITESPACE) && (currentToken.emitToken() == XmlToken.OPEN_ELEMENT_NAME)) {
-      var element = BagObject.open(_ELEMENT, currentToken.value());
+      var name = currentToken.value();
+      var element = BagObject.open(_ELEMENT, name);
       while (readToken()) {
         switch(currentToken.emitToken()) {
           case END_OPEN_ELEMENT -> {
-            return readBody(element);
+            if ((voidElements == null) || (! voidElements.contains(name))) {
+              return readBody (element);
+            } else {
+              return element;
+            }
           }
           case EMPTY_ELEMENT -> {
             return element;
@@ -190,9 +203,14 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   static {
     MimeType.addExtensionMapping (MimeType.XML, "pom");
     MimeType.addExtensionMapping (MimeType.XML, "xml");
-    MimeType.addExtensionMapping (MimeType.HTML, "html");
     MimeType.addMimeTypeMapping (MimeType.XML, "text/xml");
     FormatReader.registerFormatReader (MimeType.XML, false, FormatReaderXml::new);
-    FormatReader.registerFormatReader (MimeType.HTML, false, FormatReaderXml::new);
+
+    MimeType.addExtensionMapping (MimeType.HTML, "htm");
+    MimeType.addExtensionMapping (MimeType.HTML, "html");
+    FormatReader.registerFormatReader (MimeType.HTML, false, (input) -> { return new FormatReaderXml(input, HTML_VOID_ELEMENTS); });
+
+    MimeType.addExtensionMapping (MimeType.XHTML, "xhtml");
+    FormatReader.registerFormatReader (MimeType.XHTML, false, FormatReaderXml::new);
   }
 }

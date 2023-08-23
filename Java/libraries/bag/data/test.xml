@@ -7,6 +7,6 @@
         <step>two</step >
         < step>three</step>
     </ steps>
-    <obj abc ="123" xyz= "yes" />
+    <obj abc ="123"    xyz= "yes" />
     <obj abc="456" xyz =  "no">object</obj>
 </node>
