@@ -19,12 +19,15 @@ import java.util.stream.Stream;
 //
 // NOTES:
 // 1) we support data in XML-ish format, not strict XML documents. For instance, the top level is
-//    not constrained to a single element
+//    not constrained to a single element, and we allow white space in some places the standard
+//    does not.
 // 2) we read an XML data block as an array of elements, which are in-turn read as BagObjects.
-// 3) elements have an element name, body (array of text entries with whitespace preserved), and
-//    children. we save these in the BagObject as _element, _body, and _children, in addition to
+// 3) elements have an element name, content (array of text entries with whitespace preserved), and
+//    children. we save these in the BagObject as _element, _content, and _children, in addition to
 //    whatever attributes are defined as key-value pairs within the element open tag
 // 4) error checking is limited
+// 5) HTML is not XML - in particular there are some elements that may or may not have close tags
+//    according to the standards (e.g. meta, link, img, br, etc.).
 public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private static final Logger log = LogManager.getLogger (FormatReaderXml.class);
 
