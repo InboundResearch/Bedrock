@@ -20,14 +20,17 @@ import java.util.stream.Stream;
 // NOTES:
 // 1) we support data in XML-ish format, not strict XML documents. For instance, the top level is
 //    not constrained to a single element, and we allow white space in some places the standard
-//    does not.
+//    does not. we also focused on "happy path" handling, reading well-formed XML or HTML files, not
+//    necessarily dealing with poorly written ones.
 // 2) we read an XML data block as an array of elements, which are in-turn read as BagObjects.
 // 3) elements have an element name, content (array of text entries with whitespace preserved), and
-//    children. we save these in the BagObject as _element, _content, and _children, in addition to
-//    whatever attributes are defined as key-value pairs within the element open tag
-// 4) error checking is limited
+//    children. we save these in the BagObject as __element, __content, and __children, in addition
+//    to whatever attributes are defined as key-value pairs within the element open tag.
+// 4) error checking is limited.
 // 5) HTML is not XML - in particular there are some elements that may or may not have bodies or
-//    close tags according to the standards (e.g. meta, link, img, br, etc.).
+//    close tags according to the standards (e.g. meta, link, img, br, etc.). we handle these by
+//    returning immediately after the end of the open tag (not reading a body), and by ignoring the
+//    close tag if we see it.
 public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private static final Logger log = LogManager.getLogger (FormatReaderXml.class);
 
@@ -36,13 +39,20 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private Set<String> voidElements = null;
   private String error = null;
 
-  public static final String _ELEMENT = "_element";
-  public static final String _CONTENT = "_content";
-  public static final String _CHILDREN = "_children";
+  // names of the fields we use in elements
+  public static final String _ELEMENT = "__element";
+  public static final String _CONTENT = "__content";
+  public static final String _CHILDREN = "__children";
 
-  private static final Set<XmlToken> IGNORE_WHITESPACE = Stream.of(XmlToken.WHITESPACE).collect(Collectors.toUnmodifiableSet());
+  // a set of tokens for ignoring whitespace
+  private static final Set<XmlToken> IGNORE_WHITESPACE = Stream.of(
+          XmlToken.WHITESPACE
+  ).collect(Collectors.toUnmodifiableSet());
+
+  // a set of element names for void elements in standard HTML
   public static final Set<String> HTML_VOID_ELEMENTS = Stream.of(
-          "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr").collect(Collectors.toUnmodifiableSet());
+          "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"
+  ).collect(Collectors.toUnmodifiableSet());
 
   public FormatReaderXml() {}
 
@@ -81,22 +91,6 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
     return readToken(null);
   }
 
-  private boolean check(XmlToken token) {
-    return (currentToken != null) && (currentToken.emitToken() == token);
-  }
-
-  private boolean expect(XmlToken token, Set<XmlToken> ignore) {
-    if (check (token)) {
-      return readToken(ignore);
-    } else {
-      return false;
-    }
-  }
-
-  private boolean expect(XmlToken token) {
-    return expect(token, null);
-  }
-
   private BagObject readBody(BagObject element) {
     while (readToken ()) {
       switch (currentToken.emitToken ()) {
@@ -110,22 +104,46 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
         }
         case BEGIN_CLOSE_ELEMENT -> {
           if (readToken(IGNORE_WHITESPACE)) {
-            if ((currentToken.emitToken () == XmlToken.CLOSE_ELEMENT_ANONYMOUS) ||
-                    ((currentToken.emitToken () == XmlToken.CLOSE_ELEMENT_NAME) &&
-                            element.getString (_ELEMENT).equals (currentToken.value ()))) {
-              if (readToken(IGNORE_WHITESPACE) && (currentToken.emitToken () == XmlToken.END_CLOSE_ELEMENT)) {
+            // ignore the close tag if it is a void element (but still read the rest of it)
+            switch (currentToken.emitToken ()) {
+              case CLOSE_ELEMENT_ANONYMOUS -> {
+                // the scanner is constructed such that the next token must be END_CLOSE_ELEMENT, so
+                // there is no need to check it. note this isn't standard, we support it for the
+                // sake of simplicity in writing xml files.
+                readToken ();
                 return element;
-              } else {
-                // XXX error
-                onError("A");
               }
-            } else {
-              // XXX error
-              onError("B - " + currentToken.toString() + " (should be '" + element.getString (_ELEMENT) + "')");
+              case CLOSE_ELEMENT_NAME -> {
+                var name = currentToken.value ();
+                // check if it's a void element
+                if ((voidElements == null) || (!voidElements.contains (name))) {
+                  // a normal close tag should match the name of the current element
+                  if (element.getString (_ELEMENT).equals (name)) {
+                    if (readToken (IGNORE_WHITESPACE) && (currentToken.emitToken () == XmlToken.END_CLOSE_ELEMENT)) {
+                      return element;
+                    } else {
+                      // XXX error
+                      onError ("Bad token - " + currentToken.toString () + " (should be '" + element.getString (_ELEMENT) + "')");
+                    }
+                  }
+                } else {
+                  // for a void element we should just ignore a properly constructed close tag.
+                  // technically, it shouldn't occur in the file at all, but lots of parsers ignore these
+                  // close tags, so they still show up in files
+                  readToken (IGNORE_WHITESPACE);
+                  log.info("Ignoring close tag for void element (" + name + ")");
+                }
+              }
+              default -> {
+                onError("Unexpected token while reading close element: " + currentToken.toString());
+              }
             }
           } else {
-            onError("unexpected end of input");
+            onError("unexpected end of input while reading close element");
           }
+        }
+        default -> {
+          onError("Unexpected token while reading body: " + currentToken.toString());
         }
       }
     }
@@ -143,7 +161,7 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
         return readToken() && (currentToken.emitToken() == XmlToken.CLOSE_QUOTE);
       }
     }
-    onError("unexpected token while reading attribute");
+    onError("Unexpected token while reading attribute: " + currentToken.toString());
     return false;
   }
 
@@ -165,22 +183,21 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
           }
           case ATTRIBUTE_NAME -> {
             if (! readAttribute(element)) {
-              // XXX ERROR
+              // XXX ERROR - resolve these error conditions a bit better
               onError("D");
               return null;
             }
           }
           case WHITESPACE -> {}
           default -> {
-            // XXX error
-            onError("E");
+            onError("Unexpected token while reading element tag: " + currentToken.toString());
             return null;
           }
         }
       }
     }
     // XXX error
-    onError("F");
+    onError("End of input encountered without reading any elements");
     return null;
   }
 
