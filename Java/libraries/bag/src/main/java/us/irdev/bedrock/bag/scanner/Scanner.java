@@ -6,6 +6,7 @@ import java.util.Map;
 public class Scanner<StateIdType, EmitTokenType> {
   protected Map<StateIdType, State<StateIdType, EmitTokenType>> states;
   private final StateIdType startStateId;
+  private final EmitTokenType endOfInputToken;
   protected StateIdType currentStateId;
   private String currentToken;
   protected String input;
@@ -15,18 +16,19 @@ public class Scanner<StateIdType, EmitTokenType> {
   protected static final boolean DONT_CAPTURE = false;
 
 
-  public Scanner (StateIdType startStateId) {
+  public Scanner (StateIdType startStateId, EmitTokenType endOfInputToken) {
     states = new HashMap<>();
     this.startStateId = startStateId;
+    this.endOfInputToken = endOfInputToken;
   }
 
   public State<StateIdType, EmitTokenType> addState(StateIdType stateId) throws DuplicateStateException {
     if (states.containsKey(stateId)) {
       throw new DuplicateStateException(stateId.toString());
     }
-    var state = new State<StateIdType, EmitTokenType>();
+    var state = new State<StateIdType, EmitTokenType>(stateId);
     states.put (stateId, state);
-    return state;
+    return state.onEnd (endOfInputToken);
   }
 
   public Token<EmitTokenType> scanChar(char input) {
@@ -76,6 +78,8 @@ public class Scanner<StateIdType, EmitTokenType> {
         return token;
       }
     }
+
+
     // XXX consider returning the final status as a "cleanup" token
     return null;
   }

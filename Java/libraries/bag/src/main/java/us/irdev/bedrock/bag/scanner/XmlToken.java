@@ -3,7 +3,7 @@ package us.irdev.bedrock.bag.scanner;
 public enum XmlToken {
     ERROR,
     WHITESPACE,
-    BODY,
+    CONTENT,
     BEGIN_OPEN_ELEMENT,
     OPEN_ELEMENT_NAME,
     END_OPEN_ELEMENT,

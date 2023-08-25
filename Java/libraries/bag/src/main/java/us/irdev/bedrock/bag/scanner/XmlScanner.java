@@ -5,19 +5,21 @@ public class XmlScanner extends Scanner<XmlState, XmlToken> {
   private static final String WHITESPACE = " \t\n\r";
 
   public XmlScanner() {
-    super(XmlState.START);
+    super(XmlState.START, XmlToken.ERROR);
 
     try {
       addState (XmlState.ERROR)
               .onAnyInput(XmlState.ERROR, CAPTURE, NO_EMIT);
 
       addState (XmlState.START)
-              .onAnyInput(XmlState.BODY, CAPTURE, NO_EMIT)
-              .onInput('<', XmlState.BEGIN_OPEN_ELEMENT, CAPTURE, NO_EMIT);
+              .onAnyInput(XmlState.CONTENT, CAPTURE, NO_EMIT)
+              .onInput('<', XmlState.BEGIN_OPEN_ELEMENT, CAPTURE, NO_EMIT)
+              .onEnd(XmlToken.CONTENT);
 
-      addState (XmlState.BODY)
-              .onAnyInput(XmlState.BODY, CAPTURE, NO_EMIT)
-              .onInput('<', XmlState.START, DONT_CAPTURE, XmlToken.BODY);
+      addState (XmlState.CONTENT)
+              .onAnyInput(XmlState.CONTENT, CAPTURE, NO_EMIT)
+              .onInput('<', XmlState.START, DONT_CAPTURE, XmlToken.CONTENT)
+              .onEnd(XmlToken.CONTENT);
 
       addState (XmlState.BEGIN_OPEN_ELEMENT)
               .onAnyInput(XmlState.OPEN_ELEMENT, DONT_CAPTURE, XmlToken.BEGIN_OPEN_ELEMENT)

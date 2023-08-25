@@ -497,7 +497,7 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         // create the destination
         var bagArray = new BagArray ();
 
-        // loop over all of the objects
+        // loop over all the objects
         for (var object : container) {
             if (object instanceof Bag) {
                 // try to match the 'match' clause
@@ -516,6 +516,15 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
             }
         }
         return bagArray;
+    }
+
+    /**
+     *
+     * @param match a BooleanExpr describing the match criteria
+     * @return
+     */
+    public BagArray query (BooleanExpr match) {
+        return query (match, null);
     }
 
     public BagArray subset (int start, int count) {

@@ -3,7 +3,7 @@ package us.irdev.bedrock.bag.scanner;
 public enum XmlState {
     START,
     ERROR,
-    BODY,
+    CONTENT,
     BEGIN_OPEN_ELEMENT,
     OPEN_ELEMENT,
     OPEN_ELEMENT_NAME,

@@ -8,6 +8,7 @@ public class State<StateIdType, EmitTokenType> {
 
   private final List<InputAction<StateIdType, EmitTokenType>> inputActions;
   private Action<StateIdType, EmitTokenType> defaultAction;
+  private StateIdType stateId;
 
   // XXX if only Java generics could actually be applied generically to base types too
   private int binarySearch (char key) {
@@ -44,8 +45,9 @@ public class State<StateIdType, EmitTokenType> {
     return -(low + 1);
   }
 
-  public State () {
+  public State (StateIdType stateId) {
     inputActions = new ArrayList<>();
+    this.stateId = stateId;
   }
 
   public Action<StateIdType, EmitTokenType> getAction (char input) {
@@ -79,6 +81,17 @@ public class State<StateIdType, EmitTokenType> {
 
   public State<StateIdType, EmitTokenType> onInput(String inputs, StateIdType nextStateId, boolean capture, EmitTokenType emitToken) throws DuplicateInputException {
     return onInput (inputs, new Action<> (nextStateId, capture, emitToken));
+  }
+
+  public State<StateIdType, EmitTokenType> onEnd(EmitTokenType emitToken) {
+    var inputAction = new InputAction<> ('\0', new Action<> (stateId, Scanner.CAPTURE, emitToken));
+    int index;
+    if ((index = binarySearch('\0')) < 0) {
+      inputActions.add (-(index + 1), inputAction);
+    } else {
+      inputActions.set(index, inputAction);
+    }
+    return this;
   }
 
   public State<StateIdType, EmitTokenType> onAnyInput(StateIdType nextStateId, boolean capture, EmitTokenType emitToken) {
