@@ -89,9 +89,15 @@ public class FormatReaderXmlTest {
         assertEquals("a", bagObject.getString(_ELEMENT));
         assertEquals("Bedrock", bagObject.getString(_CONTENT));
 
+        // verify it correctly fails to find something not in the tree
         bagArray = queryTree(root, "class", "BLARGH");
         assertEquals(0, bagArray.getCount());
 
+        // verify it with a different type of criteria
+        bagArray = queryTree(root, "id", "test-me");
+        assertEquals(1, bagArray.getCount());
+        bagObject = bagArray.getBagObject (0);
+        assertEquals("abc", bagObject.getString("xyz"));
     }
 
     @Test
