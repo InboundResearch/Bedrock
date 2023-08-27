@@ -5,7 +5,6 @@ import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagArrayFrom;
 import us.irdev.bedrock.bag.expr.Exprs;
 
-import javax.swing.text.AbstractDocument;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
