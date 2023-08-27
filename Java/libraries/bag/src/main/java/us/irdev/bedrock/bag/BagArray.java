@@ -487,11 +487,24 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         return this;
     }
 
+    static private boolean queryMatch(BagArray bagArray, Object object, BooleanExpr match, SelectKey selectKey) {
+        // try to match the 'match' clause
+        var bag = (Bag) object;
+        var matches = (match == null) || bag.match (match);
+        if (matches) {
+            // select the desired parts
+            object = ((Selectable) bag).select (selectKey);
+            bagArray.add (object);
+            return true;
+        }
+        return false;
+    }
+
     /**
      *
      * @param match a BooleanExpr describing the match criteria
      * @param selectKey a SelectKey with the values to extract
-     * @return
+     * @return array of elements matching the query
      */
     public BagArray query (BooleanExpr match, SelectKey selectKey) {
         // create the destination
@@ -500,14 +513,7 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         // loop over all the objects
         for (var object : container) {
             if (object instanceof Bag) {
-                // try to match the 'match' clause
-                var bag = (Bag) object;
-                var matches = (match == null) || bag.match (match);
-                if (matches) {
-                    // select the desired parts
-                    object = ((Selectable) bag).select (selectKey);
-                    bagArray.add (object);
-                }
+                queryMatch(bagArray, object, match, selectKey);
             } else if (object instanceof String){
                 // XXX TODO
                 // it's a string, 'match' needs to be { field:"*",... } or not have field
@@ -521,10 +527,44 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
     /**
      *
      * @param match a BooleanExpr describing the match criteria
-     * @return
+     * @return array of elements matching the query
      */
     public BagArray query (BooleanExpr match) {
         return query (match, null);
+    }
+
+    /**
+     * query a tree, assuming a structure of a BagArray of BagObjects where the objects might have
+     * children in a named field.
+     * @param match a BooleanExpr describing the match criteria
+     * @param selectKey a SelectKey with the values to extract
+     * @param childrenName name of a field in found objects that will contain a child or list of
+     *                     children to query
+     * @return array of elements matching the query throughout the tree
+     */
+    public BagArray queryTree (BooleanExpr match, SelectKey selectKey, String childrenName) {
+        // treat it like a query initially
+        var result = query(match, selectKey);
+
+        // now loop over all the objects in the array looking for children to sub-query
+        for (var object : container) {
+            if (object instanceof BagObject) {
+                // treat this as a node in the tree, if it has children
+                var bagObject = (BagObject) object;
+                var children = bagObject.getObject(childrenName);
+                if (children instanceof BagArray) {
+                    result = concat(result, ((BagArray) children).queryTree(match, selectKey, childrenName));
+                } else if (children instanceof BagObject) {
+                    queryMatch(result, children, match, selectKey);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public BagArray queryTree (BooleanExpr match, String childrenName) {
+        return queryTree(match, null, childrenName);
     }
 
     public BagArray subset (int start, int count) {

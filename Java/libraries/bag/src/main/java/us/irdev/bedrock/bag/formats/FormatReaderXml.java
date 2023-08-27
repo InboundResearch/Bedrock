@@ -2,6 +2,8 @@ package us.irdev.bedrock.bag.formats;
 
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
+import us.irdev.bedrock.bag.expr.BooleanExpr;
+import us.irdev.bedrock.bag.expr.Exprs;
 import us.irdev.bedrock.bag.scanner.Token;
 import us.irdev.bedrock.bag.scanner.XmlScanner;
 import us.irdev.bedrock.bag.scanner.XmlToken;
@@ -19,8 +21,8 @@ import java.util.stream.Stream;
 //
 // NOTES:
 // 1) we support data in XML-ish format, not strict XML documents. For instance, we allow white
-//    space in some places the standard does not, we allow anonymous end tags ("</>"), attributes
-//    without values, etc.
+//    space in some places the standard does not, anonymous end tags ("</>"), attributes without
+//    values, etc.
 // 2) we focused on "happy path" handling, reading reasonably well-formed XML or HTML files, not
 //    necessarily dealing with poorly-formed examples. error checking is limited. diagnostics for
 //    the location of an error in the file is a future feature.
@@ -84,13 +86,16 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   }
 
   private boolean readToken(Set<XmlToken> ignore) {
-    while ((error == null) && ((currentToken = scanner.scanToken()) != null)) {
-      log.info (currentToken.toString());
-      if ((ignore == null) || (! ignore.contains(currentToken.emitToken()))) {
-        return true;
+    if (error == null) {
+      while ((currentToken = scanner.scanToken ()) != null) {
+        log.debug (currentToken.toString ());
+        if ((ignore == null) || (!ignore.contains (currentToken.emitToken ()))) {
+          return true;
+        }
       }
+    } else {
+      currentToken = null;
     }
-    currentToken = null;
     return false;
   }
 
@@ -159,8 +164,12 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   private BagObject readContent(String elementName, BagObject element) {
     if ((voidElements == null) || (! voidElements.contains(elementName))) {
       var content = readContent(elementName, new BagArray());
-      if (content.getCount() > 0) {
-        element.add(_CONTENT, content);
+      // if there is no content, we skip this step. if there is only one entry in the content array,
+      // we want to add it directly. otherwise, we copy the entire array.
+      switch (content.getCount()) {
+        case 0 -> {}
+        case 1 -> element.add (_CONTENT, content.getObject(0));
+        default -> element.add(_CONTENT, content);
       }
     }
     return element;
@@ -206,10 +215,12 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
           }
           case ATTRIBUTE_NAME -> {
             if (readAttribute(element)) {
+              // for the case where a bare attribute (with no value assignment) is allowed, we might
+              // return here sitting at the END_OPEN_ELEMENT token. we should process it.
               if (currentToken.emitToken() == XmlToken.END_OPEN_ELEMENT) {
                 return readContent (elementName, element);
               }
-            }else {
+            } else {
               onError("Unexpected token while reading attribute: " + currentToken.toString());
               return null;
             }
@@ -227,17 +238,38 @@ public class FormatReaderXml extends FormatReader implements ArrayFormatReader {
   }
 
   public BagArray readBagArray () {
-    // initialize the scanner with the input
+    // initialize the scanner with the input and no errors
     scanner.start (input);
     error = null;
 
     // read the content
-    var array = new BagArray ();
-    do{
-      log.info("pump");
-      readContent ("__root", array);
-    } while (currentToken != null);
-    return array;
+    return readContent ("__root", new BagArray ());
+  }
+
+  public static BagArray queryPath (BagArray root, String path) {
+    // split the path by '/'
+    var paths = path.split ("/", 2);
+    switch (paths.length) {
+      case 0 -> { return null; }
+      case 1 -> { return root.query(Exprs.equality (_ELEMENT, path)); }
+      default -> {
+        var newRoot = root.query(Exprs.equality (_ELEMENT, paths[0]));
+        if (newRoot.getCount() > 0) {
+          var newRootObject = newRoot.getBagObject(0).getObject(_CONTENT);
+          if (newRootObject instanceof BagArray) {
+            return queryPath((BagArray) newRootObject, paths[1]);
+          }
+
+          newRoot = newRoot.getBagObject(0).getBagArray (_CONTENT);
+          return queryPath (newRoot, paths[1]);
+        }
+      }
+    }
+    return null;
+  }
+
+  public static BagArray queryTree (BagArray root, String field, String value) {
+    return root.queryTree(Exprs.containment(field, value), _CONTENT);
   }
 
   static {

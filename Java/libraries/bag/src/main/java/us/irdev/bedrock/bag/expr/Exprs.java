@@ -39,6 +39,7 @@ public class Exprs {
     }
 
     static {
+        register (Containment.CONTAINMENT, Containment::new);
         register (Equality.EQUALITY, Equality::new);
         register (Not.NOT, Not::new);
         register (Key.KEY, Key::new);
@@ -53,5 +54,9 @@ public class Exprs {
 
     public static BooleanExpr inequality (String key, Object value) {
         return (BooleanExpr) get (Not.bag (Equality.bag (Key.bag (key), Value.bag (value))));
+    }
+
+    public static BooleanExpr containment (String key, Object value) {
+        return (BooleanExpr) get (Containment.bag (Key.bag (key), Value.bag (value)));
     }
 }

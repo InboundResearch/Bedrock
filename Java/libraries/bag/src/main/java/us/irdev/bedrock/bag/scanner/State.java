@@ -84,9 +84,9 @@ public class State<StateIdType, EmitTokenType> {
   }
 
   public State<StateIdType, EmitTokenType> onEnd(EmitTokenType emitToken) {
-    var inputAction = new InputAction<> ('\0', new Action<> (stateId, Scanner.CAPTURE, emitToken));
+    var inputAction = new InputAction<> (Scanner.END_OF_INPUT, new Action<> (stateId, Scanner.DONT_CAPTURE, emitToken));
     int index;
-    if ((index = binarySearch('\0')) < 0) {
+    if ((index = binarySearch(Scanner.END_OF_INPUT)) < 0) {
       inputActions.add (-(index + 1), inputAction);
     } else {
       inputActions.set(index, inputAction);

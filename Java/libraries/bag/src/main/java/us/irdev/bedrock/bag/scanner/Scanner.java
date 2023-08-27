@@ -14,6 +14,7 @@ public class Scanner<StateIdType, EmitTokenType> {
 
   protected static final boolean CAPTURE = true;
   protected static final boolean DONT_CAPTURE = false;
+  protected static final char END_OF_INPUT = '\0';
 
 
   public Scanner (StateIdType startStateId, EmitTokenType endOfInputToken) {
@@ -79,9 +80,8 @@ public class Scanner<StateIdType, EmitTokenType> {
       }
     }
 
-
-    // XXX consider returning the final status as a "cleanup" token
-    return null;
+    // send the end of input into the scanner
+    return (currentToken.length() > 0) ? scanChar(END_OF_INPUT) : null;
   }
 
   public void scanString(String input, Receiver<EmitTokenType> receiver) {

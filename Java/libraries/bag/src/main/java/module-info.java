@@ -6,6 +6,7 @@ module us.irdev.bedrock.bag {
 
     exports us.irdev.bedrock.bag;
     exports us.irdev.bedrock.bag.entry;
+    exports us.irdev.bedrock.bag.expr;
     exports us.irdev.bedrock.bag.formats;
-  exports us.irdev.bedrock.bag.scanner;
+    exports us.irdev.bedrock.bag.scanner;
 }
