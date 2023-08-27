@@ -11,6 +11,20 @@
     <packaging>pom</packaging>
     <name>Libraries</name>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </distributionManagement>
+
     <modules>
         <module>logger</module>
         <module>base</module>
@@ -33,6 +47,10 @@
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
+                        <configuration>
+                            <!-- skip when version is SNAPSHOT -->
+                            <skip>${is.snapshot}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -46,6 +64,10 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <!-- skip when version is SNAPSHOT -->
+                            <skip>${is.snapshot}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -73,9 +95,14 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
+                        <configuration>
+                            <!-- skip when version is SNAPSHOT -->
+                            <skip>${is.snapshot}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -88,6 +115,7 @@
                     <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
@@ -95,7 +123,7 @@
                 <configuration>
                     <updatePomFile>true</updatePomFile>
                     <outputDirectory>target</outputDirectory>
-                    <flattenMode>minimum</flattenMode>
+                    <flattenMode>ossrh</flattenMode>
                 </configuration>
                 <executions>
                     <execution>
@@ -107,6 +135,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

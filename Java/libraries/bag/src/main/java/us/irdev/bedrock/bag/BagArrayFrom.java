@@ -8,6 +8,7 @@ import us.irdev.bedrock.logger.*;
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.function.Supplier;
 
@@ -108,13 +109,21 @@ public class BagArrayFrom {
 
     // from a HTTP connection (get)
     static public BagArray url (String urlString) {
-        return url (urlString, () -> null);
+        return url (urlString, null, () -> null);
+    }
+
+    static public BagArray url (String urlString, String overrideMimeType) {
+        return url (urlString, overrideMimeType, () -> null);
     }
 
     static public BagArray url (String urlString, Supplier<BagArray> fail) {
+        return url (urlString, null, fail);
+    }
+
+    static public BagArray url (String urlString, String overrideMimeType, Supplier<BagArray> fail) {
         try {
-            var url = new URL (urlString);
-            return url (url, fail);
+            var url = URI.create (urlString).toURL();
+            return url (url, overrideMimeType, fail);
         } catch (MalformedURLException exception) {
             log.error (exception);
         }
@@ -122,12 +131,23 @@ public class BagArrayFrom {
     }
 
     static public BagArray url (URL url) {
-        return url (url, () -> null);
+        return url (url, null, () -> null);
+    }
+
+    static public BagArray url (URL url, String overrideMimeType) {
+        return url (url, overrideMimeType, () -> null);
     }
 
     static public BagArray url (URL url, Supplier<BagArray> fail) {
+        return url (url, null, fail);
+    }
+
+    static public BagArray url (URL url, String overrideMimeType, Supplier<BagArray> fail) {
         try {
             var sourceAdapter = new SourceAdapterHttp(url);
+            if (overrideMimeType != null) {
+                sourceAdapter.setMimeType (overrideMimeType);
+            }
             return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);

@@ -200,11 +200,19 @@ public class BagArrayTest {
     }
 
     @Test
-    public void testQuery2 () {
+    public void testQueryContainment () {
+        File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
+        BagArray bagArray = BagArrayFrom.file (testFile);
+        BagArray queried = bagArray.query (Exprs.containment ("Date of Launch", "1988"));
+        BagTest.report (queried.getCount () == 1, true, "Verify good load from sample file with containment query");
+    }
+
+    @Test
+    public void testQueryEqualityWithPath () {
         File testFile = new File ("data", "spark-applications.json");
         BagArray bagArray = BagArrayFrom.file (testFile);
-        BagArray queried = bagArray.query (Exprs.equality ("attempts/#last/completed", true), null);
-        BagTest.report (queried.getCount () > 0, true, "Verify good load from sample file with query");
+        BagArray queried = bagArray.query (Exprs.equality ("attempts/#last/completed", true));
+        BagTest.report (queried.getCount () > 0, true, "Verify good load from sample file with equality query");
     }
 
     @Test

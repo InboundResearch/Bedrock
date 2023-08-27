@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/img/icon.png?v=1"/>
+    <link rel="stylesheet" href="/dist/1.7.1/bedrock.css"></link>
+    <meta name="viewport" content="width=920,initial-scale=1,user-scalable=yes"/>
+    <title>Bedrock v.1.7.1</title>
+</head>
+<script src="/dist/1.7.1/bedrock.js"></script>
+<body>
+
+<h1>Bedrock</h1>
+<div class="container-div">
+    <h2>About</h2>
+    <div class="description-div">
+        <p>Bedrock is a tool for quickly building lightweight micro-services in Java, using JSON for communications.</p>
+    </div>
+
+    <h2>Developer</h2>
+    <div class="description-div">
+        <ul>
+            <li><a href="interface.jsp">Test Interface</a> - an example of the bedrock service and the service descriptor. </li>
+            <li>Find the sources on Github @ <a href="https://github.com/brettonw/bedrock">brettonw/Bedrock</a>.</li>
+        </ul>
+    </div>
+
+    <h2>Documentation</h2>
+    <div class="description-div">
+        <h3>Java</h3>
+        <ul>
+            <li><a href="/dist/1.7.1/docs/bag/">Bag</a></li>
+            <li><a href="/dist/1.7.1/docs/secret/">Secret</a></li>
+            <li><a href="/dist/1.7.1/docs/database/">Database</a></li>
+            <li><a href="/dist/1.7.1/docs/service-base/">Service-Base</a></li>
+            <li><a href="/dist/1.7.1/docs/servlet-tester/">Servlet-Tester</a></li>
+        </ul>
+
+        <h3>Javascript</h3>
+        <ul>
+            <li><a href="/dist/1.7.1/docs/bedrock/">Bedrock</a></li>
+        </ul>
+
+        <p style="margin: 12px 0;">USAGE:</p>
+        <pre class="code-pre">&lt;link rel="stylesheet" href="https://bedrock.brettonw.com/dist/1.7.1/bedrock.css"/>
+&lt;script src="https://bedrock.brettonw.com/dist/1.7.1/bedrock.js">&lt;/script></pre>
+    </div>
+
+    <h2>Examples</h2>
+    <div class="description-div">
+        <ul>
+            <li><a href="/examples/combobox.jsp">ComboBox</a></li>
+            <li><a href="/examples/database">Database</a></li>
+            <li><a href="/examples/forms.jsp">Forms</a></li>
+            <li><a href="/examples/html.jsp">HTML</a></li>
+            <li><a href="/examples/http.jsp">HTTP</a></li>
+        </ul>
+    </div>
+
+    <div id="test-me" xyz="abc"></div>
+
+    <h2>Admin</h2>
+    <div class="description-div">
+        <ul>
+            <li><a href="/lock.jsp">Lock</a></li>
+        </ul>
+    </div>
+</div>
+<div class="content-center footer">Built with <a class="footer-link" href="https://bedrock.brettonw.com">Bedrock</a></div>
+</body>
+</html>
+
+<script>
+    Bedrock.Cookie.set ("context-path", "/");
+    Bedrock.Cookie.set ("full-context-path", location.origin + "/");
+
+    let addImageIcon = function () {
+
+        // XXX this SHOULD be Bedrock code
+
+        var h1s = Array.from (document.getElementsByTagName ("h1"));
+        for (let h1 of h1s) {
+            let div = document.createElement ("div");
+            div.classList.add("header-wrapper");
+            let root = h1.parentNode;
+            root.insertBefore (div, h1);
+            root.removeChild (h1);
+            let internalDiv = document.createElement ("div");
+            internalDiv.classList.add ("header-title");
+            div.appendChild (internalDiv);
+            internalDiv.appendChild (h1);
+
+            let anchorDiv = document.createElement("div");
+            anchorDiv.classList.add ("header-image");
+
+            let anchorVersion = document.createElement("div");
+            anchorVersion.innerHTML = "v.1.7.1";
+            anchorVersion.classList.add ("header-version");
+            anchorDiv.appendChild(anchorVersion);
+
+            let a = document.createElement ("a");
+            a.href = Bedrock.Cookie.get ("context-path");
+            a.title = "Home";
+            let img = document.createElement ("img");
+            img.src = Bedrock.Cookie.get ("context-path") + "img/icon.png";
+            img.height = 48;
+
+            a.appendChild(img);
+            anchorDiv.appendChild(a);
+            div.appendChild (anchorDiv);
+            return;
+        }
+        setTimeout (addImageIcon, 0.1);
+    };
+
+    setTimeout (addImageIcon, 0.1);
+</script>

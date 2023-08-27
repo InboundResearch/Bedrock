@@ -3,6 +3,8 @@ package us.irdev.bedrock.bag.formats;
 import us.irdev.bedrock.logger.*;
 import java.util.Arrays;
 
+import static us.irdev.bedrock.bag.formats.Utility.sortString;
+
 public class FormatReaderParsed extends FormatReader {
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
@@ -50,18 +52,31 @@ public class FormatReaderParsed extends FormatReader {
         return (! error) && (index < inputLength);
     }
 
+    protected boolean inspectForNewLine(char c) {
+        if (c == NEW_LINE) {
+            ++lineNumber;
+            lastLineIndex = index;
+            return true;
+        }
+        return false;
+    }
+
     protected int consumeWhile (char[] inChars, boolean allowEscape) {
         var start = index;
         char c;
         while (check () && in (inChars, c = input.charAt (index))) {
-            // make sure to update line numbers if appropriate
-            if (c == NEW_LINE) {
-                ++lineNumber;
-                lastLineIndex = index;
+            inspectForNewLine(c);
+
+            // using the escape mechanism is like a free pass for the next character, but we don't
+            // do any transformation on the substring, just return it as written after checking for
+            // newlines
+            if ((c == '\\') && allowEscape) {
+                ++index;
+                inspectForNewLine(input.charAt (index));
             }
-            // using the escape mechanism is like a free pass for the next character, but we
-            // don't do any transformation on the substring, just return it as written
-            index += ((c == '\\') && allowEscape) ? 2 : 1;
+
+            // consume the character
+            ++index;
         }
         return start;
     }
@@ -74,14 +89,18 @@ public class FormatReaderParsed extends FormatReader {
         var start = index;
         char c;
         while (check () && notIn (stopChars, c = input.charAt (index))) {
-            // make sure to update line numbers if appropriate
-            if (c == NEW_LINE) {
-                ++lineNumber;
-                lastLineIndex = index;
+            inspectForNewLine(c);
+
+            // using the escape mechanism is like a free pass for the next character, but we don't
+            // do any transformation on the substring, just return it as written after checking for
+            // newlines
+            if ((c == '\\') && allowEscape) {
+                ++index;
+                inspectForNewLine(input.charAt (index));
             }
-            // using the escape mechanism is like a free pass for the next character, but we
-            // don't do any transformation on the substring, just return it as written
-            index += ((c == '\\') && allowEscape) ? 2 : 1;
+
+            // consume the character
+            ++index;
         }
         return start;
     }
@@ -96,6 +115,7 @@ public class FormatReaderParsed extends FormatReader {
 
         // the next character should be the one we expect
         if (check() && (input.charAt (index) == c)) {
+            inspectForNewLine(c);
             ++index;
             return true;
         }
@@ -106,8 +126,24 @@ public class FormatReaderParsed extends FormatReader {
         consumeWhitespace();
 
         // the next character should be the one we expect
-        if (check() && in(chars, input.charAt (index))) {
+        char c;
+        if (check() && in(chars, (c = input.charAt (index)))) {
+            inspectForNewLine(c);
             ++index;
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean expect(String string) {
+        consumeWhitespace();
+
+        // the substring from here should be the one we expect
+        // XXX TODO - make sure there are enough characters left in the stream to fulfill the substring request
+        // XXX - think about whether case insensitivity should be allowed
+        var stringLength = string.length();
+        if (check() && input.substring (index, index + stringLength).equals(string)) {
+            index += stringLength;
             return true;
         }
         return false;
@@ -120,6 +156,14 @@ public class FormatReaderParsed extends FormatReader {
      */
     protected boolean require(char c) {
         return require (expect (c), "'" + c + "'");
+    }
+
+    protected boolean require(char[] chars) {
+        return require (expect (chars), "[" + chars.toString() + "]");
+    }
+
+    protected boolean require(String string) {
+        return require (expect (string), "\"" + string + "\"");
     }
 
     /**
@@ -168,13 +212,6 @@ public class FormatReaderParsed extends FormatReader {
         }
     }
 
-    // functions useful to derived classes
-    protected static char[] sortString (String string) {
-        var chars = string.toCharArray ();
-        Arrays.sort (chars);
-        return chars;
-    }
-
     protected String readString (char[] stopChars) {
         // " chars " | <chars>
         var result = (String) null;
@@ -186,12 +223,25 @@ public class FormatReaderParsed extends FormatReader {
         return result;
     }
 
-    protected String readBareValue (char[] stopChars) {
+    protected String readBareValueUntil (char[] stopChars) {
         // " chars " | <chars>
         var result = (String) null;
         var start = consumeUntil (stopChars, true);
 
-        // capture the result if we actually consumed some characters
+        // captureInput the result if we actually consumed some characters
+        if (index > start) {
+            result = input.substring (start, index);
+        }
+
+        return result;
+    }
+
+    protected String readBareValueWhile (char[] inChars) {
+        // " chars " | <chars>
+        var result = (String) null;
+        var start = consumeWhile (inChars, false);
+
+        // captureInput the result if we actually consumed some characters
         if (index > start) {
             result = input.substring (start, index);
         }

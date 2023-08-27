@@ -84,17 +84,17 @@ public class HandlerArrayFromFixed extends HandlerComposite {
         for (int i = 0, end = exemplar.length (); i < end; ++i) {
             var nextChar = exemplar.charAt (i);
             if (nextChar != lastChar) {
-                // emit this position
+                // emitToken this position
                 if (lastChar == separator) {
-                    // emit this position as a start
+                    // emitToken this position as a start
                     queue.add (i);
                 } else {
-                    // emit this position as an end
+                    // emitToken this position as an end
                     queue.add (i);
 
-                    // emit a start if the next character is not a separator
+                    // emitToken a start if the next character is not a separator
                     if (nextChar != separator) {
-                        // emit this position as a start
+                        // emitToken this position as a start
                         queue.add (i);
                     }
                 }
@@ -102,7 +102,7 @@ public class HandlerArrayFromFixed extends HandlerComposite {
             }
         }
         if (lastChar != separator) {
-            // emit this position as an end
+            // emitToken this position as an end
             queue.add (exemplar.length ());
         }
 

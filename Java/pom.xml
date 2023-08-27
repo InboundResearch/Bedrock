@@ -22,6 +22,8 @@
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 
         <!-- goal: eliminate these -->
         <commons-io.version>2.13.0</commons-io.version>
@@ -56,17 +58,6 @@
         <url>https://github.com/InboundResearch/Bedrock.git</url>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -83,6 +74,33 @@
 
     <build>
         <plugins>
+            <!-- sets the is.snapshot property to true if version is a SNAPSHOT -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-helper-regex-is-snapshot</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>regex-properties</goal>
+                        </goals>
+                        <configuration>
+                            <regexPropertySettings>
+                                <regexPropertySetting>
+                                    <name>is.snapshot</name>
+                                    <value>${bedrock.version}</value>
+                                    <regex>.*-SNAPSHOT</regex>
+                                    <replacement>true</replacement>
+                                    <failIfNoMatch>false</failIfNoMatch>
+                                </regexPropertySetting>
+                            </regexPropertySettings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -97,6 +115,7 @@
                             <target>
                                 <!-- this profile-name comes from the settings.xml/profile properties -->
                                 <echo level="info" message="current profile: ${profile-name}" />
+                                <echo level="info" message="is.snapshot = ${is.snapshot}" />
                             </target>
                         </configuration>
                     </execution>
@@ -114,7 +133,9 @@
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
+                        <!--
                         <arg>-Xlint:unchecked</arg>
+                        -->
                     </compilerArgs>
                     <fork>true</fork>
                 </configuration>
@@ -139,6 +160,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>${maven-install-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
             </plugin>
         </plugins>
     </build>

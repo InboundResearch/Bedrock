@@ -100,7 +100,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
             var mid = (low + high) >>> 1;
 
             // the entire reason this has its own custom binary search function is that Java
-            // generics don't capture the need to search inside a complex object like this.
+            // generics don't captureInput the need to search inside a complex object like this.
             var cmp = container[mid].key.compareTo (key);
 
             // check the result of the comparison
