@@ -4,9 +4,11 @@ import us.irdev.bedrock.bag.BagArray;
 
 import static us.irdev.bedrock.bag.formats.Utility.sortString;
 
-// reads a delimited table format, like CSV, or tab delimited... the result is an array of bag-objects
-// representing the named columns. we either require a first line that contains the columns or a
-// supplied array of column names. comment lines are allowed outside of an entry.
+// reads a delimited table format, like CSV, or tab delimited... the result is a BagArray of
+// BagArrays representing the data within columns. a separate process can take the first row of
+// input as the column names or a given set of column names, and convert this to a BagArray of
+// BagObjects.
+// comment lines are allowed outside of an entry.
 public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFormatReader {
   private final char delimiter;
   private final char[] bareValueStopChars;
@@ -21,7 +23,7 @@ public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFo
     bareValueStopChars = null;
   }
 
-  private FormatReaderDelimited (String input, char delimiter, char comment) {
+  protected FormatReaderDelimited (String input, char delimiter, char comment) {
     super (input, false);
     this.delimiter = delimiter;
     this.bareValueStopChars = sortString("\n" + delimiter);
@@ -40,7 +42,6 @@ public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFo
     String entry = readString(QUOTED_STRING_STOP_CHARS);
     return (entry != null) ? entry : readBareValueUntil (bareValueStopChars);
   }
-
 
   private BagArray readLine() {
     // comment lines get eaten and discarded
@@ -69,11 +70,5 @@ public class FormatReaderDelimited extends FormatReaderParsed implements ArrayFo
       bagArray.add (line);
     }
     return bagArray;
-  }
-
-  static {
-    MimeType.addExtensionMapping (MimeType.CSV, "csv");
-    MimeType.addMimeTypeMapping (MimeType.CSV);
-    FormatReader.registerFormatReader (MimeType.CSV, false, (input) -> {return new FormatReaderDelimited(input, ',', '#');});
   }
 }

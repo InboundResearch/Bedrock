@@ -576,6 +576,16 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         return bagArray;
     }
 
+    /**
+     * trim only from the end
+     *
+     */
+    public BagArray subset (int start) {
+        return subset(start, count - start);
+    }
+
+    // XXX TODO - slices, like python slicing?
+
     public <Type> Type[] toArray (Class<Type> type) {
         try {
             var constructor = type.getConstructor (String.class);

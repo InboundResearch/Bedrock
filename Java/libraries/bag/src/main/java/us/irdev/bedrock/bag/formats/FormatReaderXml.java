@@ -2,7 +2,6 @@ package us.irdev.bedrock.bag.formats;
 
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
-import us.irdev.bedrock.bag.expr.BooleanExpr;
 import us.irdev.bedrock.bag.expr.Exprs;
 import us.irdev.bedrock.bag.scanner.Token;
 import us.irdev.bedrock.bag.scanner.XmlScanner;
