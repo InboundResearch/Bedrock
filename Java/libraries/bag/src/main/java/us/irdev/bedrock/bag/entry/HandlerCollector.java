@@ -6,7 +6,7 @@ import us.irdev.bedrock.bag.BagArray;
  * in an array of subarrays, collects the subarrays into new subarrays consisting of a number of the original subarrays
  * XXX need a better description than that
  */
-public class HandlerCollector implements Handler {
+public class HandlerCollector extends Handler {
     private final int collectCount;
     private final Handler arrayHandler;
 

@@ -3,11 +3,10 @@ package us.irdev.bedrock.bag.formats;
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
 import us.irdev.bedrock.bag.SourceAdapter;
-import us.irdev.bedrock.logger.*;
-
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,7 +14,7 @@ import java.util.function.Function;
 public class FormatReader {
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
-    protected final String input;
+    protected final char[] input;
 
     protected FormatReader () {
         this (null);
@@ -26,7 +25,7 @@ public class FormatReader {
      * @param input
      */
     public FormatReader (String input) {
-        this.input = input;
+        this.input = input.toCharArray();
     }
 
     // static type registration by name
@@ -93,9 +92,8 @@ public class FormatReader {
     }
 
     static {
-        @SuppressWarnings("unchecked")
-        // rather than have a compile-time and run-time dependency, we just list the sub-
-        // classes of FormatReader here that need to be loaded.
+        // rather than have a compile-time and run-time dependency, we just list the subclasses of
+        // FormatReader here that need to be loaded.
         var formatReaders = new Class[] {
                 FormatReaderComposite.class,
                 FormatReaderTableAdapter.class,
@@ -108,7 +106,7 @@ public class FormatReader {
                 type.getConstructor ().newInstance ();
             } catch (IllegalAccessException exception) {
                 // do nothing
-            } catch (InstantiationException | InvocationTargetException | NoSuchMethodException exception) {
+            } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException exception) {
                 log.error (exception);
             }
         }

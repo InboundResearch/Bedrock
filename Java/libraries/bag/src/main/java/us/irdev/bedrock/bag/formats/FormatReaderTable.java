@@ -3,7 +3,8 @@ package us.irdev.bedrock.bag.formats;
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
 import us.irdev.bedrock.bag.entry.Handler;
-import us.irdev.bedrock.logger.*;
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 
 public class FormatReaderTable extends FormatReader implements ArrayFormatReader {
@@ -32,7 +33,7 @@ public class FormatReaderTable extends FormatReader implements ArrayFormatReader
     @Override
     public BagArray readBagArray () {
         // get the processed array
-        var bagArray = (BagArray) arrayHandler.getEntry (input);
+        var bagArray = (BagArray) arrayHandler.getEntry (new String (input));
         if (bagArray != null) {
             // filter it for actual entries, check to see if anything is left
             bagArray = bagArray.filter (object -> ((BagArray) object).getCount () > 0);

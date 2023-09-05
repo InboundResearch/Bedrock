@@ -100,7 +100,7 @@ public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatR
     private Object readValue () {
         // <Value> ::= <String> | <Object> | <Array>
         consumeWhitespace();
-        return check () ? switch (input.charAt(index)) {
+        return check () ? switch (input[index]) {
             case '{' -> readBagObject();
             case '[' -> readBagArray();
             case '"' -> readString(QUOTED_STRING_STOP_CHARS);

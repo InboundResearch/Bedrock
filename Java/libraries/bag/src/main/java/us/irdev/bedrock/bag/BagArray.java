@@ -4,8 +4,8 @@ import us.irdev.bedrock.bag.expr.BooleanExpr;
 import us.irdev.bedrock.bag.formats.FormatReader;
 import us.irdev.bedrock.bag.formats.FormatWriter;
 import us.irdev.bedrock.bag.formats.MimeType;
-import us.irdev.bedrock.logger.*;
-
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;

@@ -3,7 +3,8 @@ package us.irdev.bedrock.bag;
 import us.irdev.bedrock.bag.formats.FormatReader;
 import us.irdev.bedrock.bag.formats.FormatWriter;
 import us.irdev.bedrock.bag.formats.MimeType;
-import us.irdev.bedrock.logger.*;
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 
 /**

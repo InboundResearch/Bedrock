@@ -1,6 +1,8 @@
 package us.irdev.bedrock.bag.formats;
 
-import us.irdev.bedrock.logger.*;
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
+
 import java.util.Arrays;
 
 import static us.irdev.bedrock.bag.formats.Utility.sortString;
@@ -64,7 +66,7 @@ public class FormatReaderParsed extends FormatReader {
     protected int consumeWhile (char[] inChars, boolean allowEscape) {
         var start = index;
         char c;
-        while (check () && in (inChars, c = input.charAt (index))) {
+        while (check () && in (inChars, c = input[index])) {
             inspectForNewLine(c);
 
             // using the escape mechanism is like a free pass for the next character, but we don't
@@ -72,7 +74,7 @@ public class FormatReaderParsed extends FormatReader {
             // newlines
             if ((c == '\\') && allowEscape) {
                 ++index;
-                inspectForNewLine(input.charAt (index));
+                inspectForNewLine(input[index]);
             }
 
             // consume the character
@@ -88,7 +90,7 @@ public class FormatReaderParsed extends FormatReader {
     protected int consumeUntil (char[] stopChars, boolean allowEscape) {
         var start = index;
         char c;
-        while (check () && notIn (stopChars, c = input.charAt (index))) {
+        while (check () && notIn (stopChars, c = input[index])) {
             inspectForNewLine(c);
 
             // using the escape mechanism is like a free pass for the next character, but we don't
@@ -96,7 +98,7 @@ public class FormatReaderParsed extends FormatReader {
             // newlines
             if ((c == '\\') && allowEscape) {
                 ++index;
-                inspectForNewLine(input.charAt (index));
+                inspectForNewLine(input[index]);
             }
 
             // consume the character
@@ -114,7 +116,7 @@ public class FormatReaderParsed extends FormatReader {
         consumeWhitespace();
 
         // the next character should be the one we expect
-        if (check() && (input.charAt (index) == c)) {
+        if (check() && (input[index] == c)) {
             inspectForNewLine(c);
             ++index;
             return true;
@@ -127,7 +129,7 @@ public class FormatReaderParsed extends FormatReader {
 
         // the next character should be the one we expect
         char c;
-        if (check() && in(chars, (c = input.charAt (index)))) {
+        if (check() && in(chars, (c = input[index]))) {
             inspectForNewLine(c);
             ++index;
             return true;
@@ -142,7 +144,7 @@ public class FormatReaderParsed extends FormatReader {
         // XXX TODO - make sure there are enough characters left in the stream to fulfill the substring request
         // XXX - think about whether case insensitivity should be allowed
         var stringLength = string.length();
-        if (check() && input.substring (index, index + stringLength).equals(string)) {
+        if (check() && new String (Arrays.copyOfRange(input, index, index + stringLength)).equals(string)) {
             index += stringLength;
             return true;
         }
@@ -193,10 +195,10 @@ public class FormatReaderParsed extends FormatReader {
             // find the end of the current line. note: line endings could only be '\n' because the
             // input reader consumed the actual line endings for us and replaced them with '\n'
             var lineEnd = index;
-            while ((lineEnd < inputLength) && (input.charAt (lineEnd) != NEW_LINE)) {
+            while ((lineEnd < inputLength) && (input[lineEnd] != NEW_LINE)) {
                 ++lineEnd;
             }
-            log.error (input.substring (lastLineIndex, lineEnd));
+            log.error (new String (Arrays.copyOfRange(input, lastLineIndex, lineEnd)));
 
             // build the error message, by computing a carat line, and adding the error message to it
             var errorIndex = index - lastLineIndex;
@@ -218,7 +220,7 @@ public class FormatReaderParsed extends FormatReader {
         if (expect('"')) {
             // digest the string, and be sure to eat the end quote
             var start = consumeUntil (stopChars, true);
-            result = input.substring (start, index++);
+            result = new String(Arrays.copyOfRange(input, start, index++));
         }
         return result;
     }
@@ -230,7 +232,7 @@ public class FormatReaderParsed extends FormatReader {
 
         // captureInput the result if we actually consumed some characters
         if (index > start) {
-            result = input.substring (start, index);
+            result = new String(Arrays.copyOfRange(input, start, index));
         }
 
         return result;
@@ -243,7 +245,7 @@ public class FormatReaderParsed extends FormatReader {
 
         // captureInput the result if we actually consumed some characters
         if (index > start) {
-            result = input.substring (start, index);
+            result = new String(Arrays.copyOfRange(input, start, index));
         }
 
         return result;
