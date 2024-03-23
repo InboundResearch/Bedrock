@@ -137,3 +137,6 @@ Building Bedrock with maven activates the irdev profile if it's configured in yo
 ```
 
 [Maven Central](https://search.maven.org/artifact/us.irdev.bedrock/bedrock)
+
+## Bedrock-1.x
+The Bedrock-1.x docker environment is intended to support testing of web-based interactions when building Bedrock-2.x with maven, and should be started via docker-compose prior to building.

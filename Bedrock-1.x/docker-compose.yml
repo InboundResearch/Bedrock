@@ -1,0 +1,8 @@
+version: "3"
+services:
+  bedrock-1.x:
+    image: "bedrock-1.x"
+    container_name: "bedrock-1.x"
+    build: .
+    ports:
+      - "8081:8080"
