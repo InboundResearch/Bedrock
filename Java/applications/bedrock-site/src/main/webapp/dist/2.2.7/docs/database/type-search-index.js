@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"us.irdev.bedrock.database","l":"Interface"},{"p":"us.irdev.bedrock.database","l":"MongoDatabase"}];updateSearchResults();

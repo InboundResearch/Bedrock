@@ -235,8 +235,22 @@ public class Base extends HttpServlet {
     }
 
     @Override
+    public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getMethod().equals("API")){
+            // XXX we will eventually migrate away from this to only support the API call within the server, post will
+            // XXX be deprecated, but we will provide support JavaScript code to call these APIs as well.
+            doPost(request, response);
+        }else {
+            super.service(request, response);
+        }
+    }
+
+    @Override
     public void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException {
-        var event = errorOnRequest ("GET is not supported.", request);
+        // a base get should be equivalent to a help request - we want to support a standard way of interfacing with the
+        // bedrock servers so naive users will get an educational response
+        var query = new BagObject().put(EVENT, HELP);
+        var event = handleEvent (query, request);
         finishRequest (event, response);
     }
 
