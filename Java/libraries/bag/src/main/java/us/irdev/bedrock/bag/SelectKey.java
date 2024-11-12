@@ -1,11 +1,9 @@
 package us.irdev.bedrock.bag;
 
-import us.irdev.bedrock.logger.*;
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
-
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 

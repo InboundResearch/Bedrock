@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"us.irdev.bedrock"}];updateSearchResults();

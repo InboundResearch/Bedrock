@@ -4,8 +4,8 @@ import us.irdev.bedrock.bag.expr.BooleanExpr;
 import us.irdev.bedrock.bag.formats.FormatReader;
 import us.irdev.bedrock.bag.formats.FormatWriter;
 import us.irdev.bedrock.bag.formats.MimeType;
-import us.irdev.bedrock.logger.*;
-
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -575,6 +575,16 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         }
         return bagArray;
     }
+
+    /**
+     * trim only from the end
+     *
+     */
+    public BagArray subset (int start) {
+        return subset(start, count - start);
+    }
+
+    // XXX TODO - slices, like python slicing?
 
     public <Type> Type[] toArray (Class<Type> type) {
         try {

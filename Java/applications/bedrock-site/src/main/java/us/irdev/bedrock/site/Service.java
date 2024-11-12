@@ -23,7 +23,7 @@ public class Service extends Base {
         var responseBagObject = new BagObject ();
         var headerNames = request.getHeaderNames ();
         while (headerNames.hasMoreElements ()) {
-            var headerName = (String) headerNames.nextElement ();
+            var headerName = headerNames.nextElement ();
             var headerValue = escapeLine(request.getHeader (headerName));
             responseBagObject.put (headerName, headerValue);
         }

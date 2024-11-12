@@ -1,5 +1,8 @@
 package us.irdev.bedrock.bag.entry;
 
-public interface Handler {
-    Object getEntry (String input);
+public abstract class Handler {
+    public abstract Object getEntry (String input);
+    public Object getEntry (char[] input) {
+        return getEntry(new String (input));
+    }
 }

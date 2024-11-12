@@ -3,7 +3,6 @@ package us.irdev.bedrock.bag.entry;
 import us.irdev.bedrock.bag.BagArray;
 
 import java.util.ArrayDeque;
-import java.util.Queue;
 
 public class HandlerArrayFromFixed extends HandlerComposite {
     private final int[][] fields;

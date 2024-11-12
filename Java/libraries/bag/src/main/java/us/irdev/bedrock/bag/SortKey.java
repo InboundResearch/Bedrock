@@ -1,7 +1,5 @@
 package us.irdev.bedrock.bag;
 
-import java.util.Arrays;
-
 public class SortKey {
     public static final String KEY = "key";
     public static final String TYPE = "type";

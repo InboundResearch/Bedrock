@@ -1,6 +1,6 @@
 package us.irdev.bedrock.bag.entry;
 
-public class HandlerRoller implements Handler {
+public class HandlerRoller extends Handler {
     private final Handler[] handlers;
     private int roll;
 

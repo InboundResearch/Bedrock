@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Logger {
-    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     private final String name;
     private Level level;
@@ -36,7 +36,7 @@ public class Logger {
             StackTraceElement caller = stackTrace[3];
             // TODO add some formatting from 'configuration', with the level and all that jazz
             date = new Date ();
-            out.format("%s [%s] (%s:%s) %s%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date), logLevel.getName(), caller.getClassName(), caller.getMethodName(), message, System.lineSeparator());
+            out.format("%s [%s] (%s:%s) %s%s", sdf.format(date), logLevel.getName(), caller.getClassName(), caller.getMethodName(), message, System.lineSeparator());
         }
         return this;
     }
