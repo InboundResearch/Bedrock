@@ -149,6 +149,7 @@ public class MongoDatabase implements Interface, AutoCloseable {
      */
     public static MongoDatabase connectLocal (String collectionName) {
         var collections = connectLocal (collectionName, collectionName);
+        // this is a terse way to get the first element from a map
         if (collections != null) {
             for (MongoDatabase mongoDatabase : collections.values ()) {
                 return mongoDatabase;
@@ -338,7 +339,7 @@ public class MongoDatabase implements Interface, AutoCloseable {
      */
     @Override
     public void close () throws Exception {
-        // XXX what should happen here?
+        // XXX what should happen here? The connections are all cached...
         log.info ("Closed '" + getName () + "'");
     }
 

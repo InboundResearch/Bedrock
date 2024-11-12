@@ -161,7 +161,7 @@ public class FormatReaderParsed extends FormatReader {
     }
 
     protected boolean require(char[] chars) {
-        return require (expect (chars), "[" + chars.toString() + "]");
+        return require (expect (chars), "[" + Arrays.toString (chars) + "]");
     }
 
     protected boolean require(String string) {
