@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <bedrock.version>2.3.1</bedrock.version>
+        <bedrock.version>2.3.2</bedrock.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
@@ -331,6 +331,9 @@
                     <updatePomFile>true</updatePomFile>
                     <outputDirectory>target</outputDirectory>
                     <flattenMode>ossrh</flattenMode>
+                    <pomElements>
+                        <properties>keep</properties>
+                    </pomElements>
                 </configuration>
                 <executions>
                     <execution>
