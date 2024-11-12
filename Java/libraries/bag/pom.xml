@@ -12,8 +12,10 @@
 
     <name>Bag</name>
     <description>Bag provides two container classes for text-based storage of constrained types in
-        an array (BagArray) or as a map (BagObject), with a means of serializing objects to and from
-        these container types.
+        an array (BagArray) or as a map (BagObject). It provides rich functional-programming APIs,
+        deep querying capabilities, and includes support for serializing objects to and from
+        these container types in JSON, XML, CSV, and web formats drawn from raw strings, files,
+        micro-services, and websites.
     </description>
 
     <dependencies>

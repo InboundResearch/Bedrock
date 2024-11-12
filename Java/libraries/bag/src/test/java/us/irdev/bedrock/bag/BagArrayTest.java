@@ -283,17 +283,17 @@ public class BagArrayTest {
 
     @Test
     public void testSubset () {
-        BagArray bagArray = new BagArray (97);
-        Random random = new Random ();
+        var bagArray = new BagArray (97);
+        var random = new Random ();
         for (int i = 0; i < 97; ++i) {
             bagArray.add (random.nextInt (100));
         }
         bagArray.sort ((SortKey[]) null);
 
-        int start = 0;
-        int pageSize = 10;
-        int pages = 0;
-        BagArray subset = bagArray.subset (start, pageSize);
+        var start = 0;
+        var pageSize = 10;
+        var pages = 0;
+        var subset = bagArray.subset (start, pageSize);
         while (subset.getCount () > 0) {
             ++pages;
             start += pageSize;
@@ -301,6 +301,20 @@ public class BagArrayTest {
             subset = bagArray.subset (start, pageSize);
         }
         BagTest.report (true, true, "Got through a subset run in " + pages + " page(s)");
+    }
+
+    @Test
+    public void testSubset2 () {
+        var count = 100;
+        var bagArray = new BagArray (count);
+        for (int i = 0; i < count; ++i) {
+            bagArray.add (i);
+        }
+        BagTest.report (bagArray.subset(0).getCount(), count, "verify subset is the right size from 0");
+        BagTest.report (bagArray.subset(1).getCount(), count - 1, "verify subset is the right size from 1");
+        BagTest.report (bagArray.subset(count / 2).getCount(), count / 2, "verify subset is the right size from midpoint");
+        BagTest.report (bagArray.subset(count - 1).getCount(), 1, "verify subset is the right size from end");
+        BagTest.report (bagArray.subset(count).getCount(), 0, "verify subset is empty from outside...");
     }
 
     @Test

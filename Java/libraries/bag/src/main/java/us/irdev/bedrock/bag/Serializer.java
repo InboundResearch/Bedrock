@@ -1,9 +1,8 @@
 package us.irdev.bedrock.bag;
 
-import us.irdev.bedrock.logger.*;
-
-
 import sun.misc.Unsafe;
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 import java.io.*;
 import java.lang.reflect.*;

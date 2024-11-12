@@ -1,11 +1,13 @@
 package us.irdev.bedrock.bag;
 
 import us.irdev.bedrock.bag.formats.MimeType;
-import us.irdev.bedrock.logger.*;
-
+import us.irdev.bedrock.logger.LogManager;
+import us.irdev.bedrock.logger.Logger;
 
 import javax.net.ssl.*;
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -111,13 +113,11 @@ public class SourceAdapterHttp extends us.irdev.bedrock.bag.SourceAdapter {
      * Sometimes a remote source is self-signed or not otherwise trusted
      */
     public static void trustAllHosts () {
-        // Create a trust manager that does not validate certificate chains
+        // create a trust manager that does not validate certificate chains
         var trustAllCerts = new TrustManager[]{
                 new X509TrustManager () {
                     public X509Certificate[] getAcceptedIssuers () { return new X509Certificate[]{}; }
-
                     public void checkClientTrusted (X509Certificate[] chain, String authType) throws CertificateException {}
-
                     public void checkServerTrusted (X509Certificate[] chain, String authType) throws CertificateException {}
                 }
         };

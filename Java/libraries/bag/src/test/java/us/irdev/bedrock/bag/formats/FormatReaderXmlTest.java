@@ -106,7 +106,7 @@ public class FormatReaderXmlTest {
 
     @Test
     public void testFormatReaderXmlWithHtmlFromUrl () {
-        confirmHtmlDoc(BagArrayFrom.url("https://bedrock.brettonw.com"));
+        confirmHtmlDoc(BagArrayFrom.url("http://localhost:8081"));
     }
 
     @Test

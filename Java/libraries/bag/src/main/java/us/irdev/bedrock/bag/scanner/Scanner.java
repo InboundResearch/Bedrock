@@ -9,7 +9,7 @@ public class Scanner<StateIdType, EmitTokenType> {
   private final EmitTokenType endOfInputToken;
   protected StateIdType currentStateId;
   private String currentToken;
-  protected String input;
+  protected char[] input;
   protected int offset;
 
   protected static final boolean CAPTURE = true;
@@ -65,16 +65,20 @@ public class Scanner<StateIdType, EmitTokenType> {
     return result;
   }
 
-  public void start (String input) {
+  public void start (char[] input) {
     this.input = input;
     currentToken = "";
     currentStateId = startStateId;
     offset = 0;
   }
 
+  public void start (String input) {
+    start (input.toCharArray());
+  }
+
   public Token<EmitTokenType> scanToken() {
-    while (offset < input.length ()) {
-      var token = scanChar(input.charAt(offset));
+    while (offset < input.length) {
+      var token = scanChar(input[offset]);
       if (token != null) {
         return token;
       }

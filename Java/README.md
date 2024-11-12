@@ -105,6 +105,21 @@ export CATALINA_OPTS="$CATALINA_OPTS -agentlib:jdwp=transport=dt_socket,server=y
 ### Docker
 After installation with brew, launch the docker desktop application and update the settings to start automatically on login.
 
+### MongoDb
+Mongo is no longer a part of the brew core installation since they switched to a non-open source license, but a custom tap is still made available from Mongo:
+
+https://github.com/mongodb/homebrew-brew
+
+Evaluate the license for your project, but the Bedrock framework still assumes a Mongo document database. (At some future time we might create a Bag-based document database)
+
+One problem we run into when running mongodb for testing Bedrock is the database files will get corrupted and mongodb won't start. If this happens, try removing the files inside the mongo directory with:
+
+```
+rm -rf /opt/homebrew/var/mongodb/*
+```
+
+... and then restart mongo either manually or as a service.
+
 ## Maven
 Building Bedrock with maven activates the irdev profile if it's configured in your ~/.m2/settings.xml. Maven settings are needed specifically for deployment, but may use other properties in the future. The settings.xml should be as follows:
 ```
@@ -137,3 +152,6 @@ Building Bedrock with maven activates the irdev profile if it's configured in yo
 ```
 
 [Maven Central](https://search.maven.org/artifact/us.irdev.bedrock/bedrock)
+
+## Bedrock-1.x
+The Bedrock-1.x docker environment is intended to support testing of web-based interactions when building Bedrock-2.x with maven, and should be started via docker-compose prior to building.

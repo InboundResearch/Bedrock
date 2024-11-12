@@ -3,7 +3,7 @@ package us.irdev.bedrock.bag.entry;
 import us.irdev.bedrock.bag.BagArray;
 import us.irdev.bedrock.bag.BagObject;
 
-public class HandlerObjectFromPairsArray implements Handler {
+public class HandlerObjectFromPairsArray extends Handler {
     private final Handler arrayHandler;
     protected boolean accumulateEntries;
 
