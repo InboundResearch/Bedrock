@@ -25,7 +25,7 @@ public class FormatReader {
      * @param input
      */
     public FormatReader (String input) {
-        this.input = input.toCharArray();
+        this.input = (input != null) ? input.toCharArray() : null;
     }
 
     // static type registration by name
@@ -93,7 +93,8 @@ public class FormatReader {
 
     static {
         // rather than have a compile-time and run-time dependency, we just list the subclasses of
-        // FormatReader here that need to be loaded.
+        // FormatReader here that need to be loaded. this is just to ensure the types are linked for
+        // future use...
         var formatReaders = new Class[] {
                 FormatReaderComposite.class,
                 FormatReaderTableAdapter.class,
@@ -103,11 +104,13 @@ public class FormatReader {
         };
         for (var type : formatReaders) {
             try {
-                type.getConstructor ().newInstance ();
+                type.getDeclaredConstructor ().newInstance ();
             } catch (IllegalAccessException exception) {
                 // do nothing
-            } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | SecurityException exception) {
-                log.error (exception);
+            } catch (InvocationTargetException exception) {
+                log.error ("InvocationTargetException: " + type.getName() + " (" + exception.getCause().getMessage() + ")");
+            } catch (InstantiationException | NoSuchMethodException | SecurityException exception) {
+                log.error ("static error: " + type.getName() + " (" + exception.toString() + ")");
             }
         }
     }

@@ -112,6 +112,8 @@ public class Base extends HttpServlet {
 
             // try to fetch the schema
             if ((schema = configuration.getBagObject (SCHEMA)) != null) {
+                log.info ("configuration loaded: " + schema.getString(NAME));
+
                 // remove the schema object from the configuration, so it is protected
                 configuration.remove (SCHEMA);
 
@@ -119,11 +121,13 @@ public class Base extends HttpServlet {
 
                 // add a 'help' event if one isn't supplied
                 if (! schema.has (help)) {
+                    log.info ("installing default '" + help + "'");
                     schema.put (help, BagObjectFrom.resource (getClass (), "/help.json"));
                 }
 
                 // add a 'version' event if one isn't supplied
                 if (! schema.has (version)) {
+                    log.info ("installing default '" + version + "'");
                     schema.put (version, BagObjectFrom.resource (getClass (), "/version.json"));
                 }
 
@@ -240,9 +244,7 @@ public class Base extends HttpServlet {
             // XXX we will eventually migrate away from this to only support the API call within the server, post will
             // XXX be deprecated, but we will provide support JavaScript code to call these APIs as well.
             doPost(request, response);
-        }else {
-            super.service(request, response);
-        }
+        } else super.service(request, response);
     }
 
     @Override
