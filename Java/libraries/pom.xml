@@ -24,9 +24,47 @@
 
     <build>
         <plugins>
+            <!-- generate docs from javadoc-formatted comments embedded in the source. the aggregate goal
+                 adds the full suite of docs (including multi-module builds) to the site output. -->
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doclint>none</doclint>
+                    <skip>${is.snapshot}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>aggregate</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- embed the java source into a library to facilitate debugging for downstream libraries -->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>source</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- skip deployment on this pom, but don't pass that to the submodules -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>

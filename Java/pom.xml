@@ -11,7 +11,7 @@
     <url>https://bedrock.irdev.us/</url>
 
     <properties>
-        <bedrock.version>2.5.1</bedrock.version>
+        <bedrock.version>2.5.2-SNAPSHOT</bedrock.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -127,9 +127,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                     <fork>true</fork>
@@ -196,30 +197,10 @@
                 </executions>
             </plugin>
 
-            <!-- generate docs from javadoc-formatted comments embedded in the source. the aggregate goal
-                 adds the full suite of docs (including multi-module builds) to the site output. -->
+            <!-- javadoc -->
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
-                <configuration>
-                    <doclint>none</doclint>
-                    <skip>${is.snapshot}</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>aggregate</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- enable testing -->
@@ -228,18 +209,10 @@
                 <version>${maven-surefire-plugin.version}</version>
             </plugin>
 
-            <!-- embed the java source into a library to facilitate debugging for downstream libraries -->
+            <!-- embed the java sources -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven-source-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>source</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- this is implicitly drawn in by the java compiler at an older version, we make it explicit
@@ -277,7 +250,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${maven-jar-plugin.version}</version>
                 <configuration>
@@ -389,7 +361,6 @@
 
             <!-- GPG signing -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>${maven-gpg-plugin.version}</version>
                 <executions>
