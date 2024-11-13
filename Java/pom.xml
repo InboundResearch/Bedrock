@@ -3,7 +3,7 @@
 
     <groupId>us.irdev.bedrock</groupId>
     <artifactId>bedrock</artifactId>
-    <version>2.5.1-SNAPSHOT</version>
+    <version>${bedrock.version}</version>
     <packaging>pom</packaging>
 
     <name>Bedrock</name>
@@ -11,7 +11,7 @@
     <url>https://bedrock.irdev.us/</url>
 
     <properties>
-        <bedrock.version>2.5.1-SNAPSHOT</bedrock.version>
+        <bedrock.version>2.5.1</bedrock.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -89,6 +89,11 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <modules>
+        <module>libraries</module>
+        <module>bom</module>
+    </modules>
 
     <build>
         <plugins>
@@ -369,6 +374,7 @@
                 <version>${exec-maven-plugin.version}</version>
             </plugin>
 
+            <!-- flatten -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
@@ -381,6 +387,7 @@
                 <version>${versions-maven-plugin.version}</version>
             </plugin>
 
+            <!-- GPG signing -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>

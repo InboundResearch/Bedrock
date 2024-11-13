@@ -1,6 +1,6 @@
 "use strict";
 let Bedrock = Object.create (null);
-Bedrock.version = "2.5.1-SNAPSHOT";
+Bedrock.version = "2.5.1";
 Bedrock.Enum = {
     create: function () {
         let _ = Object.create (null);
