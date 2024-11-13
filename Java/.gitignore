@@ -16,5 +16,5 @@ buildNumber.properties
 
 # artifacts of our build process
 **/buil*.txt
-/applications/bedrock-site/src/main/webapp/dist/*-SNAPSHOT
-/applications/bedrock-site/src/main/webapp/dist/latest
+/site/src/main/webapp/dist/*-SNAPSHOT
+/site/src/main/webapp/dist/latest
