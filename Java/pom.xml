@@ -1,43 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <bedrock.version>2.3.2</bedrock.version>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>17</java.version>
-
-        <!-- dependency versions - get a report on updates with
-              > mvn -N versions:display-property-updates
-             or omit the -N to traverse the entire project hierarchy -->
-        <mongodb.version>5.2.1</mongodb.version>
-        <tomcat.version>10.1.33</tomcat.version>
-
-        <junit-jupiter.version>5.11.3</junit-jupiter.version>
-
-        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
-        <maven-install-plugin.version>3.1.3</maven-install-plugin.version>
-        <maven-deploy-plugin.version>3.1.3</maven-deploy-plugin.version>
-        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
-        <exec-maven-plugin.version>3.1.1</exec-maven-plugin.version>
-        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
-        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <central-publishing-maven-plugin.version>0.6.0</central-publishing-maven-plugin.version>
-
-        <!-- goal: eliminate these -->
-        <commons-io.version>2.15.0</commons-io.version>
-    </properties>
-
     <groupId>us.irdev.bedrock</groupId>
     <artifactId>bedrock</artifactId>
     <version>${bedrock.version}</version>
@@ -46,6 +9,56 @@
     <name>Bedrock</name>
     <description>A foundation for rapidly building microservices with client interactions.</description>
     <url>https://bedrock.irdev.us/</url>
+
+    <properties>
+        <bedrock.version>2.5.1</bedrock.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- project static versions -->
+        <maven-minimum.version>3.9.0</maven-minimum.version>
+        <java.version>17</java.version>
+
+        <!-- dependency versions - get a report on updates with
+              > mvn versions:display-property-updates -->
+        <mongodb.version>5.2.1</mongodb.version>
+        <tomcat.version>10.1.33</tomcat.version>
+
+        <junit-jupiter.version>5.11.3</junit-jupiter.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <central-publishing-maven-plugin.version>0.6.0</central-publishing-maven-plugin.version>
+
+        <!-- maven "core" plugins - get a report on updates with
+             > mvn versions:display-plugin-updates -->
+        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
+        <maven-install-plugin.version>3.1.3</maven-install-plugin.version>
+        <maven-deploy-plugin.version>3.1.3</maven-deploy-plugin.version>
+        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
+        <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
+        <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
+        <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
+        <maven-project-info-reports-plugin.version>3.8.0</maven-project-info-reports-plugin.version>
+
+        <!-- non "core" maven plugins used to help the build process -->
+        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
+        <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+
+        <!-- goal: eliminate these -->
+        <commons-io.version>2.15.0</commons-io.version>
+    </properties>
+
     <licenses>
         <license>
             <name>MIT License</name>
@@ -67,10 +80,11 @@
         <url>https://github.com/InboundResearch/Bedrock.git</url>
     </scm>
 
+    <!-- all sub-projects will have this dependency -->
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>junit-jupiter-api</artifactId>
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
@@ -78,11 +92,50 @@
 
     <modules>
         <module>libraries</module>
-        <module>applications</module>
+        <module>bom</module>
     </modules>
 
     <build>
         <plugins>
+            <!-- make sure the build environment is up to snuff -->
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>${maven-minimum.version}</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>${java.version}</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- configure the java compiler, this works for 1.8 up to the current version (21 as of this
+                 writing) -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+
             <!-- sets the is.snapshot property to true if version is a SNAPSHOT -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -99,7 +152,7 @@
                             <regexPropertySettings>
                                 <regexPropertySetting>
                                     <name>is.snapshot</name>
-                                    <value>${bedrock.version}</value>
+                                    <value>${project.version}</value>
                                     <regex>.*-SNAPSHOT</regex>
                                     <replacement>true</replacement>
                                     <failIfNoMatch>false</failIfNoMatch>
@@ -110,8 +163,9 @@
                 </executions>
             </plugin>
 
+            <!-- some build level reporting - as above for the build-helper-maven-plugin, order is
+                 important, this belongs after the build helper... -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>${maven-antrun-plugin.version}</version>
                 <executions>
@@ -121,64 +175,134 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
+                            <exportAntProperties>true</exportAntProperties>
                             <target>
-                                <!-- this profile-name comes from the settings.xml/profile properties -->
-                                <echo level="info" message="current profile: ${profile-name}" />
-                                <echo level="info" message="is.snapshot = ${is.snapshot}" />
+                                <!-- this profile.name comes from the settings.xml/profile properties. -->
+                                <echo level="info" message="current profile: ${profile.name}" />
+
+                                <!-- we use this property to skip some steps in snapshot builds. -->
+                                <echo level="info" message="is.snapshot: ${is.snapshot} (${project.version})" />
+
+                                <!-- ...such as the 'source' plugin, which does not have a 'skip' configuration like
+                                     most other maven plugins do. -->
+                                <property name="maven.source.skip">${is.snapshot}</property>
+
+                                <!-- just some reporting to help with debugging. -->
+                                <echo level="info" message="project.basedir: ${project.basedir}" />
+                                <!-- <echo level="info" message="maven.multiModuleProjectDirectory: ${maven.multiModuleProjectDirectory}"/> -->
                             </target>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
+            <!-- generate docs from javadoc-formatted comments embedded in the source. the aggregate goal
+                 adds the full suite of docs (including multi-module builds) to the site output. -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
-                    <source>${java.version}</source>
-                    <release>${java.version}</release>
-                    <target>${java.version}</target>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                    <compilerArgs>
-                        <!--
-                        <arg>-Xlint:unchecked</arg>
-                        -->
-                    </compilerArgs>
-                    <fork>true</fork>
+                    <doclint>none</doclint>
+                    <skip>${is.snapshot}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>aggregate</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- enable testing -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+
+            <!-- embed the java source into a library to facilitate debugging for downstream libraries -->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>source</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- this is implicitly drawn in by the java compiler at an older version, we make it explicit
+             because the default version is deprecated and causes warnings -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+            </plugin>
+
+            <!-- establish the version of the assembly plugin to use in child projects -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+            </plugin>
+
+            <!-- establish the version of the deploy plugin to use in child projects -->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+            </plugin>
+
+            <!-- establish the version of the release plugin and its configuration to use in child
+                 projects -->
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+                <configuration>
+                    <preparationGoals>clean verify</preparationGoals>
                 </configuration>
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven-clean-plugin.version}</version>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven-resources-plugin.version}</version>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
+
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>${maven-install-plugin.version}</version>
             </plugin>
+
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven-deploy-plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-                <inherited>false</inherited>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports-plugin.version}</version>
             </plugin>
 
             <!-- add jacoco code coverage. this happens in two parts: the first is during tests when run
@@ -243,67 +367,27 @@
             </plugin>
             -->
 
-            <!-- sets the is.snapshot property to true if version is a SNAPSHOT - these are executed in
-                 POM order, so we want this to stay near the top -->
+            <!-- a few common helper plugings we'll use -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build-helper-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>build-helper-regex-is-snapshot</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>regex-properties</goal>
-                        </goals>
-                        <configuration>
-                            <regexPropertySettings>
-                                <regexPropertySetting>
-                                    <name>is.snapshot</name>
-                                    <value>${project.version}</value>
-                                    <regex>.*-SNAPSHOT</regex>
-                                    <replacement>true</replacement>
-                                    <failIfNoMatch>false</failIfNoMatch>
-                                </regexPropertySetting>
-                            </regexPropertySettings>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
             </plugin>
 
-            <!-- some build level reporting - as above for the build-helper-maven-plugin, order is
-                 important, this belongs after the build helper... -->
+            <!-- flatten -->
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>${maven-antrun-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <exportAntProperties>true</exportAntProperties>
-                            <target>
-                                <!-- this profile.name comes from the settings.xml/profile properties. -->
-                                <echo level="info" message="current profile: ${profile.name}" />
-
-                                <!-- we use this property to skip some steps in snapshot builds. -->
-                                <echo level="info" message="is.snapshot: ${is.snapshot} (${project.version})" />
-
-                                <!-- ...such as the 'source' plugin, which does not have a 'skip' configuration like
-                                     most other maven plugins do. -->
-                                <property name="maven.source.skip">${is.snapshot}</property>
-
-                                <!-- just some reporting to help with debugging. -->
-                                <echo level="info" message="project.basedir: ${project.basedir}" />
-                                <!-- <echo level="info" message="maven.multiModuleProjectDirectory: ${maven.multiModuleProjectDirectory}"/> -->
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+            </plugin>
+
+            <!-- GPG signing -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -323,29 +407,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>${flatten-maven-plugin.version}</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <outputDirectory>target</outputDirectory>
-                    <flattenMode>ossrh</flattenMode>
-                    <pomElements>
-                        <properties>keep</properties>
-                    </pomElements>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
+            <!-- https://central.sonatype.org/publish/publish-portal-maven/ -->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
