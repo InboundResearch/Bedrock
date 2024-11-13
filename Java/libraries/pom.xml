@@ -30,9 +30,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <doclint>none</doclint>
-                    <!--
                     <skip>${is.snapshot}</skip>
-                    -->
                 </configuration>
                 <executions>
                     <execution>
@@ -47,10 +45,6 @@
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
-                        <configuration>
-                            <reportOutputDirectory>${project.reporting.outputDirectory}</reportOutputDirectory>
-                            <destDir>javadocs</destDir>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
