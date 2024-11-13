@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>us.irdev.bedrock</groupId>
+        <artifactId>bedrock</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>bedrock-bom</artifactId>
+    <version>${bedrock.version}</version>
+    <packaging>pom</packaging>
+    <name>Bedrock Bill Of Materials</name>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>bag</artifactId>
+                <version>${bedrock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>base</artifactId>
+                <version>${bedrock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>database</artifactId>
+                <version>${bedrock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>logger</artifactId>
+                <version>${bedrock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>secret</artifactId>
+                <version>${bedrock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>service-base</artifactId>
+                <version>${bedrock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>servlet-tester</artifactId>
+                <version>${bedrock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-servlet-api</artifactId>
+                <version>${tomcat.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-sync</artifactId>
+                <version>${mongodb.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- flatten -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <outputDirectory>target</outputDirectory>
+                    <flattenMode>bom</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>

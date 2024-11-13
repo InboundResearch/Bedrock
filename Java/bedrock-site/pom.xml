@@ -3,8 +3,8 @@
 
     <parent>
         <groupId>us.irdev.bedrock</groupId>
-        <artifactId>applications</artifactId>
-        <version>${bedrock.version}</version>
+        <artifactId>bedrock</artifactId>
+        <version>2.5.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>bedrock-site</artifactId>
@@ -16,6 +16,51 @@
         <javascript.testDistDirectory>src/test/dist</javascript.testDistDirectory>
         <javascript.srcDistLatestDirectory>src/main/webapp/dist/latest</javascript.srcDistLatestDirectory>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>us.irdev.bedrock</groupId>
+                <artifactId>bedrock-bom</artifactId>
+                <version>${bedrock.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>us.irdev.bedrock</groupId>
+            <artifactId>bag</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>us.irdev.bedrock</groupId>
+            <artifactId>base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>us.irdev.bedrock</groupId>
+            <artifactId>logger</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>us.irdev.bedrock</groupId>
+            <artifactId>secret</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>us.irdev.bedrock</groupId>
+            <artifactId>service-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>us.irdev.bedrock</groupId>
+            <artifactId>servlet-tester</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <finalName>bedrock</finalName>

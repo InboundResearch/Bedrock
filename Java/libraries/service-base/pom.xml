@@ -13,6 +13,10 @@
     <name>Service Base</name>
     <description>Service Base is a tool for quickly building lightweight micro-services in Java, using JSON for communications.</description>
 
+    <properties>
+        <commons-io.version>2.15.0</commons-io.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-io</groupId>
