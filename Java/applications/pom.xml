@@ -47,7 +47,9 @@
     </dependencies>
 
     <modules>
+        <!--
         <module>bedrock-site</module>
+        -->
     </modules>
 
     <build>
