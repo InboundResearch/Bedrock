@@ -1,4 +1,3 @@
-version: "3"
 services:
   bedrock-1.x:
     image: "bedrock-1.x"

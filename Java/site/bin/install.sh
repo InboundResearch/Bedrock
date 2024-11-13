@@ -9,9 +9,7 @@ set -e
 TARGET_DIR="$PROJECT_DIR/target";
 
 # docker setup
-DOCKER_COUNT=$(docker system info | grep -i images | awk '{print $2}');
-
-echo "Install: building docker tag $PROJECT_NAME:${PROJECT_VERSION,,} using machine ($DOCKER_MACHINE_NAME)";
+echo "Install: building docker tag $PROJECT_NAME:${PROJECT_VERSION,,}";
 
 cp -r $PROJECT_DIR/src/main/docker $TARGET_DIR/docker
 cp $TARGET_DIR/bedrock.war $TARGET_DIR/docker/ROOT.war

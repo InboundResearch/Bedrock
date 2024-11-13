@@ -73,7 +73,7 @@ echo "-----";
 echo "Generate Docs - Start";
 
 # ensure the distribution directories are present and empty
-DOCS_ARTIFACT_VERSION_DIR="$ARTIFACT_VERSION_DIR/docs";
+DOCS_ARTIFACT_VERSION_DIR="$ARTIFACT_VERSION_DIR/jsdocs";
 if [ ! -d "$DOCS_ARTIFACT_VERSION_DIR" ]; then
     mkdir -p "$DOCS_ARTIFACT_VERSION_DIR";
 fi;
@@ -83,21 +83,13 @@ echo "Generate Docs - Created doc artifact dirs at $DOCS_ARTIFACT_VERSION_DIR";
 # make the docs (implicitly uses yuidoc.json)
 echo "Generate Docs - Make docs";
 
-#
-if [ 0 ]; then
-yuidoc --config bin/yuidoc.json --project-version "$PROJECT_VERSION" --quiet --outdir "$DOCS_ARTIFACT_VERSION_DIR/$PROJECT_NAME" "$SRC_DIR";
+# copy docs from libraries - XXX yuidoc is broken
+echo "Generate Docs - Create JS Docs";
+#yuidoc --config bin/yuidoc.json --project-version "$PROJECT_VERSION" --quiet --outdir "$DOCS_ARTIFACT_VERSION_DIR" "$SRC_DIR";
 
-# copy docs from dependent projects (maven aggregation goals don't seem to work for this)
+# copy docs from libraries
 echo "Generate Docs - Copy library docs";
-pushd "$PROJECT_DIR/../../libraries";
-for LIBRARY_NAME in *; do
-    if [ -d "$LIBRARY_NAME" ]; then
-        echo "$LIBRARY_NAME";
-        cp -r "$LIBRARY_NAME/target/apidocs" "$DOCS_ARTIFACT_VERSION_DIR/$LIBRARY_NAME";
-    fi
-done
-popd;
-fi
+cp -r "$PROJECT_DIR/../libraries/target/reports/apidocs" "$ARTIFACT_VERSION_DIR/";
 
 echo "Generate Docs - Done";
 

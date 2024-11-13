@@ -18,11 +18,7 @@
     <div class="description-div">
         <h3>Java</h3>
         <ul>
-            <li><a href="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/docs/bag/">Bag</a></li>
-            <li><a href="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/docs/secret/">Secret</a></li>
-            <li><a href="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/docs/database/">Database</a></li>
-            <li><a href="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/docs/service-base/">Service-Base</a></li>
-            <li><a href="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/docs/servlet-tester/">Servlet-Tester</a></li>
+            <li><a href="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/apidocs/index.html">JavaDocs</a></li>
         </ul>
 
         <h3>Javascript</h3>
