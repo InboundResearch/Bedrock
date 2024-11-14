@@ -8,7 +8,6 @@
     </parent>
 
     <artifactId>bom</artifactId>
-    <version>${bedrock.version}</version>
     <packaging>pom</packaging>
     <name>Bill Of Materials</name>
 

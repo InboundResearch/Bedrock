@@ -8,7 +8,6 @@
     </parent>
 
     <artifactId>libraries</artifactId>
-    <version>${bedrock.version}</version>
     <packaging>pom</packaging>
     <name>Libraries</name>
 
