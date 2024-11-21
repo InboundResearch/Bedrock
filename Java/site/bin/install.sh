@@ -14,7 +14,9 @@ echo "Install: building docker tag $PROJECT_NAME:${PROJECT_VERSION,,}";
 cp -r $PROJECT_DIR/src/main/docker $TARGET_DIR/docker
 cp $TARGET_DIR/bedrock.war $TARGET_DIR/docker/ROOT.war
 pushd $TARGET_DIR/docker
-docker build --tag "$PROJECT_NAME:${PROJECT_VERSION,,}" .
+docker build --no-cache --tag "$PROJECT_NAME:${PROJECT_VERSION,,}" .
+
+
 popd
 
 echo "Install: Finished";
