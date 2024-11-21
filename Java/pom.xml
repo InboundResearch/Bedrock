@@ -11,7 +11,7 @@
     <url>https://bedrock.irdev.us/</url>
 
     <properties>
-        <bedrock.version>2.5.4</bedrock.version>
+        <bedrock.version>2.5.5</bedrock.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -52,11 +52,11 @@
         <!-- non "core" maven plugins used to help the build process -->
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
-        <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
 
         <!-- goal: eliminate these -->
-        <commons-io.version>2.15.0</commons-io.version>
+        <commons-io.version>2.18.0</commons-io.version>
     </properties>
 
     <licenses>
