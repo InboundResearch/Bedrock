@@ -442,30 +442,31 @@ public class Base extends HttpServlet {
 
     public void handleEventLogFile (Event event) throws IOException {
         var logFile = configuration.getString(LOG_FILE, () -> context.getRealPath(File.separator).replaceFirst("webapps.*", "logs/catalina.out"));
-        try (var reader = new ReversedLinesFileReader(new File(logFile), UTF_8)) {
+        try (var reader = ReversedLinesFileReader.builder()
+                .setFile(new File(logFile))
+                .setCharset(UTF_8)
+                .get()) {
             var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
-            var result = new BagArray(nLines);
             var end = Base.class.getCanonicalName() + ":init";
-            for (int counter = 0; counter < nLines; ++counter) {
-                var line = reader.readLine();
-                if (line != null) {
-                    // log 1234567890123 I us.irdev.bedrock.class (method) message",
-                    var array = line.split(" ", 5);
+            var result = new BagArray();
+            var line = reader.readLine();
+            while ((line != null) && (result.getCount() < nLines))  {
+                var array = line.split(" ", 5);
+                if (array.length == 5) {
                     var method = unbox(array[3]);
-                    if (array.length == 5) {
-                        result.add(BagObject
-                                .open(TIMESTAMP, array[0] + " " + array[1])
-                                .put(LEVEL, unbox(array[2]))
-                                .put(METHOD,  method)
-                                .put(MESSAGE, escapeLine(array[4]))
-                        );
+                    result.add(BagObject
+                            .open(TIMESTAMP, array[0] + " " + array[1])
+                            .put(LEVEL, unbox(array[2]))
+                            .put(METHOD,  method)
+                            .put(MESSAGE, escapeLine(array[4]))
+                    );
 
-                        // stop after the servlet initialization...
-                        if (method.equals(end)) {
-                            break;
-                        }
+                    // stop after the servlet initialization...
+                    if (method.equals(end)) {
+                        break;
                     }
                 }
+                line = reader.readLine();
             }
             event.ok(result);
         }

@@ -5,8 +5,6 @@ import us.irdev.bedrock.service.Base;
 import us.irdev.bedrock.service.Event;
 import us.irdev.bedrock.logger.*;
 
-import java.util.regex.Pattern;
-
 public class Service extends Base {
     private static final Logger log = LogManager.getLogger (Service.class);
 
