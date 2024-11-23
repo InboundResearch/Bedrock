@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -446,6 +447,8 @@ public class Base extends HttpServlet {
                 .setFile(new File(logFile))
                 .setCharset(UTF_8)
                 .get()) {
+            var validLevels = Set.of("INFO", "WARNING", "DEBUG", "TRACE", "ERROR");
+
             var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
             var end = Base.class.getCanonicalName() + ":init";
             var result = new BagArray();
@@ -453,17 +456,21 @@ public class Base extends HttpServlet {
             while ((line != null) && (result.getCount() < nLines))  {
                 var array = line.split(" ", 5);
                 if (array.length == 5) {
-                    var method = unbox(array[3]);
-                    result.add(BagObject
-                            .open(TIMESTAMP, array[0] + " " + array[1])
-                            .put(LEVEL, unbox(array[2]))
-                            .put(METHOD,  method)
-                            .put(MESSAGE, escapeLine(array[4]))
-                    );
+                    // vet the resulting array for valid text - check that level is a valid log level
+                    var level = unbox(array[2]);
+                    if (validLevels.contains (level)) {
+                        var method = unbox(array[3]);
+                        result.add(BagObject
+                                .open(TIMESTAMP, array[0] + " " + array[1])
+                                .put(LEVEL, level)
+                                .put(METHOD, method)
+                                .put(MESSAGE, escapeLine(array[4]))
+                        );
 
-                    // stop after the servlet initialization...
-                    if (method.equals(end)) {
-                        break;
+                        // stop after the servlet initialization...
+                        if (method.equals(end)) {
+                            break;
+                        }
                     }
                 }
                 line = reader.readLine();

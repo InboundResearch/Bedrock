@@ -379,7 +379,6 @@ Bedrock.ServiceDescriptor = function () {
             document.title = specification.name;
             innerHTML = block ("h1", {}, specification.name) + div("container-div", innerHTML);
         }
-        innerHTML += div ("content-center footer", "Built with " + a ("footer-link", "http://bedrock.irdev.us", "Bedrock"));
         // now add a floating pane that is invisible and install the click handler to hide it
         innerHTML +=
             block ("div", { id: "bedrock-service-descriptor-hover-box" },
