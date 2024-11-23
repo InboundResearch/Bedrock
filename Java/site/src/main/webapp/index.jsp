@@ -49,5 +49,4 @@
         </ul>
     </div>
 </div>
-<div class="content-center footer">Built with <a class="footer-link" href="https://bedrock.irdev.us">Bedrock</a></div>
 <%@include file="includes/footer.jsp" %>

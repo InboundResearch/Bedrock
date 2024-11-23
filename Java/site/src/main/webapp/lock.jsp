@@ -8,30 +8,22 @@
     <div id="lock-form-container"></div>
 
 </div>
-<div class="content-center footer">Built with <a class="footer-link" href="https://bedrock.irdev.us">Bedrock</a></div>
 <%@include file="includes/footer.jsp" %>
 
 <script>
-    const LOCK = "lock";
-    const SECRET = "secret";
-
+    const SECRET = Bedrock.Forms.SECRET;
     Bedrock.Forms.new ({
-        name: LOCK,
+        name: "lock",
         div: "lock-form-container",
         inputs: [
-            { name: SECRET, type: Bedrock.Forms.SECRET, label: "Secret:", required: true, placeholder: "xxxx1234" }
+            { name: SECRET, type: SECRET, label: "Secret:", required: true, placeholder: "xxxx1234" }
         ],
-        completion: function (form) {
-            let postData = form.getValues ();
-            Bedrock.ServiceBase.post ({ event: LOCK }, JSON.stringify (postData), function (response) {
-                if (typeof (response) !== "undefined") {
-                    alert (JSON.stringify (response, null, 4));
-                } else {
-                    // this is the success function, but these events may not have a response...
-                    alert ("OK");
-                }
+        onCompletion: function (form) {
+            var responseFunc = function (response) {
+                alert ((typeof (response) !== "undefined") ? JSON.stringify (response, null, 4) : "OK (with undefined response)");
                 form.reset ();
-            });
+            };
+            Bedrock.ServiceBase.post (form.name, form.getValues (), responseFunc, responseFunc);
         }
     });
 </script>

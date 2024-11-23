@@ -1,4 +1,5 @@
 <%@ page import="us.irdev.bedrock.site.Service" %>
+<div class="content-center footer">Built with <a class="footer-link" href="https://bedrock.irdev.us">Bedrock</a> v.<%= Service.getBedrockVersion() %></div>
 </body>
 </html>
 
