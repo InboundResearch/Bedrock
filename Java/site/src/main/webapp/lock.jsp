@@ -19,7 +19,7 @@
             { name: SECRET, type: SECRET, label: "Secret:", required: true, placeholder: "xxxx1234" }
         ],
         onCompletion: function (form) {
-            var responseFunc = function (response) {
+            let responseFunc = function (response) {
                 alert ((typeof (response) !== "undefined") ? JSON.stringify (response, null, 4) : "OK (with undefined response)");
                 form.reset ();
             };
