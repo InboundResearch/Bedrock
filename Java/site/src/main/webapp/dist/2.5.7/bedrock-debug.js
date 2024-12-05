@@ -292,7 +292,7 @@ Bedrock.ServiceDescriptor = function () {
             let eventsHTML = "";
             for (let eventName of eventNames) {
                 let event = events[eventName];
-                // events are assumed to be published, but if they have a p"published: false"
+                // events are assumed to be published, but if they have a "published: false"
                 // attribute, we will skip it
                 if (! (("published" in event) && ((event.published === false) || (event.published === "false")))) {
                     let eventHTML = "";
@@ -376,7 +376,7 @@ Bedrock.ServiceDescriptor = function () {
             innerHTML += div("events-div", eventsHTML);
         }
         if ("name" in specification) {
-            document.title = specification.name;
+            //document.title = specification.name;
             innerHTML = block ("h1", {}, specification.name) + div("container-div", innerHTML);
         }
         // now add a floating pane that is invisible and install the click handler to hide it

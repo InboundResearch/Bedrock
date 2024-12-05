@@ -45,6 +45,7 @@
     <h2>Admin</h2>
     <div class="description-div">
         <ul>
+            <li><a href="<%= request.getContextPath() %>/log.jsp">Log</a></li>
             <li><a href="<%= request.getContextPath() %>/lock.jsp">Lock</a></li>
         </ul>
     </div>
