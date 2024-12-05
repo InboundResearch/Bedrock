@@ -11,7 +11,7 @@
     <url>https://bedrock.irdev.us/</url>
 
     <properties>
-        <bedrock.version>2.5.7</bedrock.version>
+        <bedrock.version>2.5.8</bedrock.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
