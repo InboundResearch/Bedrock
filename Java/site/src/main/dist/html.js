@@ -145,6 +145,41 @@ Bedrock.Html = function () {
         return undefined;
     };
 
+    /**
+     * Utility function to reliably retrieve a style value from the stylesheets
+     * collection, regardless of whether the style is defined locally or remotely
+     * @param selector the name of the class to fetch a style value from
+     * @param style the name of the style to fetch
+     * @returns {string} the found style value, or undefined
+     */
+    $.getCssSelectorStyleByTesting = function (selector, style) {
+        // create a hidden container
+        const hiddenContainer = document.createElement('div');
+        hiddenContainer.style.position = 'absolute';
+        hiddenContainer.style.visibility = 'hidden';
+        hiddenContainer.style.width = '0';
+        hiddenContainer.style.height = '0';
+        hiddenContainer.style.overflow = 'hidden';
+
+        // create a test element and append it to the hidden container
+        const testElement = document.createElement('div');
+        testElement.className = selector;
+        hiddenContainer.appendChild(testElement);
+
+        // append the hidden container to the document body
+        document.body.appendChild(hiddenContainer);
+
+        // compute the height of the element
+        const computedStyle = window.getComputedStyle(testElement);
+        const result = computedStyle[style];
+
+        // clean up, remove the hidden container
+        document.body.removeChild(hiddenContainer);
+
+        // return the derived result
+        return result;
+    };
+
     $.Builder = function () {
         let _ = Object.create (Bedrock.Base);
 
@@ -201,4 +236,3 @@ Bedrock.Html = function () {
 
     return $;
 } ();
-

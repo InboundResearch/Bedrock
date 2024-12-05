@@ -46,7 +46,9 @@
         background-color: #aaa;
     }
 </style>
-<script>
+<script type="module">
+    const Bedrock = window.Bedrock;
+
     const LOG_FILE = "log-file";
     const TIMESTAMP = "timestamp";
     const DATE = "date";

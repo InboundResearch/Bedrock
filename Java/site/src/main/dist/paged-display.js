@@ -176,7 +176,7 @@ Bedrock.PagedDisplay = function () {
             // page, so we don't want to just blow the size way up.
             const records = this.records;
             const recordCount = records.length;
-            const rowHeight = parseInt (Html.getCssSelectorStyle ("." + styles[Style.TABLE_ROW], "height"));
+            const rowHeight = parseInt (Html.getCssSelectorStyleByTesting (styles[Style.TABLE_ROW], "height"));
             const containerHeight = getContainerHeight (rowHeight);
             const pageSize = Math.max (Math.floor ((containerHeight / rowHeight) * 1.25), 1);
             const pageHeight = rowHeight * pageSize;
