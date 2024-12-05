@@ -3,7 +3,7 @@
 <div class="container-div">
     <h2>About</h2>
     <div class="description-div">
-        <p>Bedrock is a tool for quickly building lightweight micro-services in Java using JSON for communications. Bedrock services are designed to run in a Tomcat application server using POST queries for security.</p>
+        <p>Bedrock is a tool for quickly building lightweight micro-services in Java using JSON for communications. Bedrock services are designed to run in a Tomcat application server using POST queries for TLS security.</p>
     </div>
 
     <h2>Developer</h2>
@@ -28,7 +28,19 @@
 
         <p style="margin: 12px 0;">USAGE:</p>
         <pre class="code-pre">&lt;link rel="stylesheet" href="https://bedrock.irdev.us/dist/<%=Service.getBedrockVersion ()%>/bedrock.css"/>
-&lt;script src="https://bedrock.irdev.us/dist/<%=Service.getBedrockVersion ()%>/bedrock.js">&lt;/script></pre>
+
+&lt;script type="module">
+    import Bedrock from "https://bedrock.irdev.us/dist/<%=Service.getBedrockVersion ()%>/bedrock.mjs";
+
+    // save the imported object to a global context for use in other script nodes
+    window.Bedrock = Bedrock;
+&lt;/script>
+
+&lt;script type="module">
+    const Bedrock = window.Bedrock;
+    ...
+    Bedrock.ServiceBase. ...
+&lt;/script></pre>
     </div>
 
     <h2>Examples</h2>

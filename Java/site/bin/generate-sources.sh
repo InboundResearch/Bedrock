@@ -37,6 +37,7 @@ cat                                 \
     comparable.js                   \
     database-filters.js             \
     database.js                     \
+    export.js                       \
     > "$CONCAT";
 popd;
 

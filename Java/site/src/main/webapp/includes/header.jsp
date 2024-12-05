@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="us.irdev.bedrock.site.Service" %>
 <!DOCTYPE html>
 <html>
@@ -9,5 +9,4 @@
     <meta name="viewport" content="width=920,initial-scale=1,user-scalable=yes"/>
     <title>Bedrock v.<%=Service.getBedrockVersion ()%></title>
 </head>
-<script src="<%= request.getContextPath() %>/dist/<%= Service.getBedrockVersion() %>/bedrock.js"></script>
 <body>

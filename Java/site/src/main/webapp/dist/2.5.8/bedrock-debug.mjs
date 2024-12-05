@@ -1,4 +1,3 @@
-"use strict";
 let Bedrock = Object.create (null);
 Bedrock.version = "2.5.8";
 Bedrock.Enum = {
@@ -638,7 +637,7 @@ Bedrock.Html = function () {
         // compute the height of the element
         const computedStyle = window.getComputedStyle(testElement);
         const result = computedStyle[style];
-        // clean up: remove the hidden container
+        // clean up, remove the hidden container
         document.body.removeChild(hiddenContainer);
         // return the derived result
         return result;
@@ -2426,3 +2425,5 @@ Bedrock.Database = function () {
     } ();
     return $;
 } ();
+export default Bedrock;
+console.log("Bedrock Module Loaded");

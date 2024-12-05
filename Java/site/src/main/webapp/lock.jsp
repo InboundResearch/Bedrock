@@ -10,7 +10,9 @@
 </div>
 <%@include file="includes/footer.jsp" %>
 
-<script>
+<script type="module">
+    const Bedrock = window.Bedrock;
+
     const SECRET = Bedrock.Forms.SECRET;
     Bedrock.Forms.new ({
         name: "lock",
