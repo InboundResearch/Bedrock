@@ -59,14 +59,37 @@
             return num.toString ().padStart (digits, '0');
         };
 
+        let getDateFromTimestamp = function (ts) {
+            // example: 2024-12-05 19:27:48.119
+            // or: 06-Dec-2024 05:06:28.522
+            const dateRegex = /^(\d{2})-([A-Za-z]{3})-(\d{4}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})$/;
+            if (dateRegex.test(ts)) {
+                // extract components from the date string
+                const [, day, month, year, hours, minutes, seconds, milliseconds] = ts.match(dateRegex);
+
+                // map month names to their numeric equivalents (0-11)
+                const monthMap = {
+                    "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                    "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+                };
+
+                // create a date object
+                return new Date(parseInt(year, 10), monthMap[month], parseInt(day, 10),
+                    parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), parseInt(milliseconds, 10));
+            } else {
+                const dateTimeString = ts.replace(" ", "T");
+                return new Date (dateTimeString);
+            }
+        };
+
         for (let record of records) {
             if (TIMESTAMP in record) {
-                // example: 2024-12-05 19:27:48.119
-                const dateTimeString = record[TIMESTAMP].replace(" ", "T");
-                let date = new Date (dateTimeString);
-                record[DATE] = date.getFullYear() + "-" + pad (date.getMonth() + 1, 2) + "-" +  pad (date.getDate(), 2);
-                record[TIME] = pad (date.getHours(), 2) + ":" + pad (date.getMinutes(), 2) + ":" + pad (date.getSeconds(), 2) + "." + pad (date.getMilliseconds(), 3);
-                record[TIMESTAMP] = date.getTime();
+                const date = getDateFromTimestamp(record[TIMESTAMP]);
+                if (!isNaN(date.getTime())) {
+                    record[DATE] = date.getFullYear() + "-" + pad(date.getMonth() + 1, 2) + "-" + pad(date.getDate(), 2);
+                    record[TIME] = pad(date.getHours(), 2) + ":" + pad(date.getMinutes(), 2) + ":" + pad(date.getSeconds(), 2) + "." + pad(date.getMilliseconds(), 3);
+                    record[TIMESTAMP] = date.getTime();
+                }
             }
         }
     };
