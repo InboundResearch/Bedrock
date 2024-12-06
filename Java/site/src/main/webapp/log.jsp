@@ -47,14 +47,21 @@
     }
 </style>
 <script type="module">
-    const Bedrock = window.Bedrock;
+    let Bedrock = window.Bedrock;
 
     const LOG_FILE = "log-file";
     const TIMESTAMP = "timestamp";
+    const METHOD = "method";
+    const LEVEL = "level"
+    const MESSAGE = "message"
     const DATE = "date";
     const TIME = "time";
 
-    let convertTimestampRecords = function (records) {
+    let ucFirst = function (str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
+    let conditionRecords = function (records) {
         let pad = function (num, digits) {
             return num.toString ().padStart (digits, '0');
         };
@@ -82,7 +89,24 @@
             }
         };
 
+        const prefixes = ["us.irdev.", "bedrock."];
+        const levels = {"WARNING": "WARN"};
         for (let record of records) {
+            if (METHOD in record) {
+                let method = record[METHOD];
+                for (let prefix of prefixes) {
+                    if (method.startsWith(prefix)) {
+                        method = method.slice(prefix.length);
+                    }
+                }
+                record[METHOD] = method;
+            }
+            if (LEVEL in record) {
+                let level = record[LEVEL];
+                if (level in levels) {
+                    record[LEVEL] = levels[level];
+                }
+            }
             if (TIMESTAMP in record) {
                 const date = getDateFromTimestamp(record[TIMESTAMP]);
                 if (!isNaN(date.getTime())) {
@@ -95,7 +119,7 @@
     };
 
     Bedrock.ServiceBase.post (LOG_FILE, { "line-count" : 100 }, function (records) {
-        convertTimestampRecords(records);
+        conditionRecords(records);
 
         // sort the records as an example
         let CF = Bedrock.CompareFunctions;
@@ -114,11 +138,11 @@
                     container: "bedrock-database-display",
                     records: db,
                     select: [
-                        { name: DATE, displayName: "Date", width: 0.075 },
-                        { name: TIME, displayName: "Time", width: 0.085 },
-                        { name: "level", displayName: "Level", width: 0.0625 },
-                        { name: "method", displayName: "Method", width: 0.35 },
-                        { name: "message", displayName: "Message", width: 0.4 }
+                        { name: DATE, displayName: ucFirst(DATE), width: 0.075 },
+                        { name: TIME, displayName: ucFirst(TIME), width: 0.085 },
+                        { name: LEVEL, displayName: ucFirst(LEVEL), width: 0.0625 },
+                        { name: METHOD, displayName: ucFirst(METHOD), width: 0.35 },
+                        { name: MESSAGE, displayName: ucFirst(MESSAGE), width: 0.4 }
                     ],
                     onclick: function (record) {
                         let jsonLines = JSON.stringify(record, null, 4).split ("\n");
