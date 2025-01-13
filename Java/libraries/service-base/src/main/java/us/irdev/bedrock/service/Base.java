@@ -448,14 +448,14 @@ public class Base extends HttpServlet {
                 .setCharset(UTF_8)
                 .get()) {
             var validLevels = Set.of("INFO", "WARNING", "DEBUG", "TRACE", "ERROR");
-            var regexTimeStamp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z";
+            var regexTimeStamp = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z");
 
             var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
             var end = Base.class.getCanonicalName() + ":init";
             var result = new BagArray();
             var line = reader.readLine();
             while ((line != null) && (result.getCount() < nLines))  {
-                if (Pattern.matches(regexTimeStamp, line)) {
+                if (regexTimeStamp.matcher(line).find()) {
                     // 2025-01-13T17:08:34.116384214Z http-nio-8080-exec-3 INFO Starting configuration XmlConfiguration[location=/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/log4j2.xml, lastModified=2024-12-07T15:26:56Z]...
                     var array = line.split(" ", 4);
                     if (array.length == 4) {

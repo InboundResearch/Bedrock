@@ -68,11 +68,20 @@
 
         let getDateFromTimestamp = function (ts) {
             // example: 2024-12-05 19:27:48.119
+            // or: 2025-01-13T15:56:22.465775626Z http-nio...
+            const dateRegexNumericForm = /^(\d{4})-(0*\d+)-(0*\d+)[ T](0*\d+):(0*\d+):(0*\d+)\.(\d{3})/;
+            if (dateRegexNumericForm.test(ts)) {
+                const [, year, month, day, hours, minutes, seconds, milliseconds] = ts.match(dateRegexNumericForm);
+                // create a date object
+                return new Date(parseInt(year, 10), parseInt(month) - 1, parseInt(day, 10),
+                    parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), parseInt(milliseconds, 10));
+            }
+
             // or: 06-Dec-2024 05:06:28.522
-            const dateRegex = /^(\d{2})-([A-Za-z]{3})-(\d{4}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})$/;
-            if (dateRegex.test(ts)) {
+            const dateRegexWordForm = /^(0*\d+)-([A-Za-z]{3})-(\d{4}) (0*\d+):(0*\d+):(0*\d+)\.(\d{3})$/;
+            if (dateRegexWordForm.test(ts)) {
                 // extract components from the date string
-                const [, day, month, year, hours, minutes, seconds, milliseconds] = ts.match(dateRegex);
+                const [, day, month, year, hours, minutes, seconds, milliseconds] = ts.match(dateRegexWordForm);
 
                 // map month names to their numeric equivalents (0-11)
                 const monthMap = {
@@ -83,10 +92,9 @@
                 // create a date object
                 return new Date(parseInt(year, 10), monthMap[month], parseInt(day, 10),
                     parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), parseInt(milliseconds, 10));
-            } else {
-                const dateTimeString = ts.replace(" ", "T");
-                return new Date (dateTimeString);
             }
+
+            return new Date("invalid-date-string");
         };
 
         const prefixes = ["us.irdev.", "bedrock."];
