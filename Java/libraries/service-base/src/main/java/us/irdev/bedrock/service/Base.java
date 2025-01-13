@@ -448,28 +448,46 @@ public class Base extends HttpServlet {
                 .setCharset(UTF_8)
                 .get()) {
             var validLevels = Set.of("INFO", "WARNING", "DEBUG", "TRACE", "ERROR");
+            var regexTimeStamp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+Z";
 
             var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
             var end = Base.class.getCanonicalName() + ":init";
             var result = new BagArray();
             var line = reader.readLine();
             while ((line != null) && (result.getCount() < nLines))  {
-                var array = line.split(" ", 5);
-                if (array.length == 5) {
-                    // vet the resulting array for valid text - check that level is a valid log level
-                    var level = unbox(array[2]);
-                    if (validLevels.contains (level)) {
-                        var method = unbox(array[3]);
-                        result.add(BagObject
-                                .open(TIMESTAMP, array[0] + " " + array[1])
-                                .put(LEVEL, level)
-                                .put(METHOD, method)
-                                .put(MESSAGE, escapeLine(array[4]))
-                        );
+                if (Pattern.matches(regexTimeStamp, line)) {
+                    // 2025-01-13T17:08:34.116384214Z http-nio-8080-exec-3 INFO Starting configuration XmlConfiguration[location=/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/log4j2.xml, lastModified=2024-12-07T15:26:56Z]...
+                    var array = line.split(" ", 4);
+                    if (array.length == 4) {
+                        var level = unbox(array[2]);
+                        if (validLevels.contains(level)) {
+                            result.add(BagObject
+                                    .open(TIMESTAMP, array[0])
+                                    .put(LEVEL, level)
+                                    .put(METHOD, array[1])
+                                    .put(MESSAGE, escapeLine(array[3]))
+                            );
+                        }
+                    }
+                } else {
+                    // 2025-01-13 17:08:33.934 [INFO] (us.irdev.bedrock.service.Base:install) Installed handler 'handleEventUserGet' for 'user-get'
+                    var array = line.split(" ", 5);
+                    if (array.length == 5) {
+                        // vet the resulting array for valid text - check that level is a valid log level
+                        var level = unbox(array[2]);
+                        if (validLevels.contains(level)) {
+                            var method = unbox(array[3]);
+                            result.add(BagObject
+                                    .open(TIMESTAMP, array[0] + " " + array[1])
+                                    .put(LEVEL, level)
+                                    .put(METHOD, method)
+                                    .put(MESSAGE, escapeLine(array[4]))
+                            );
 
-                        // stop after the servlet initialization...
-                        if (method.equals(end)) {
-                            break;
+                            // stop after the servlet initialization...
+                            if (method.equals(end)) {
+                                break;
+                            }
                         }
                     }
                 }

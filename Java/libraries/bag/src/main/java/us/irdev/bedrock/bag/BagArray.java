@@ -584,7 +584,7 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         return subset(start, count - start);
     }
 
-    // XXX TODO - slices, like python slicing?
+    // XXX TODO - slices (like python slicing?), functional operators (map, reduce, filter)
 
     public <Type> Type[] toArray (Class<Type> type) {
         try {
