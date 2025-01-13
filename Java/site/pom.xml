@@ -4,7 +4,7 @@
     <parent>
         <groupId>us.irdev.bedrock</groupId>
         <artifactId>bedrock</artifactId>
-        <version>2.5.8</version>
+        <version>2.5.9</version>
     </parent>
 
     <artifactId>site</artifactId>
@@ -58,6 +58,14 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-servlet-api</artifactId>
         </dependency>
+        <!-- https://www.mongodb.com/docs/drivers/java/sync/v4.5/fundamentals/logging/ -->
+        <!--
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        -->
     </dependencies>
 
     <build>

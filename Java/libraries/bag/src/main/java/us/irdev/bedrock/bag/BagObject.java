@@ -18,7 +18,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
     private static final int DOUBLING_CAP = 16;
     static final String PATH_SEPARATOR = "/";
 
-    private class Pair {
+    private static class Pair {
         final String key;
         Object value;
 
@@ -132,7 +132,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
 
             // make sure there is room in the underlying container, then store a new (empty) Pair
             grow (index);
-            container[index] = new Pair (key);
+            container[index] = new Pair(key);
         }
         return container[index];
     }

@@ -27,15 +27,18 @@
         </ul>
 
         <p style="margin: 12px 0;">USAGE:</p>
-        <pre class="code-pre">&lt;link rel="stylesheet" href="https://bedrock.irdev.us/dist/<%=Service.getBedrockVersion ()%>/bedrock.css"/>
+        <pre class="code-pre">&lt;head>
+    &lt;link rel="stylesheet" href="https://bedrock.irdev.us/dist/<%=Service.getBedrockVersion ()%>/bedrock.css"/>
+    ...
+&lt;/head>
 
+&lt;!-- import the bedrock module and save it as a window global for retrieval -->
 &lt;script type="module">
     import Bedrock from "https://bedrock.irdev.us/dist/<%=Service.getBedrockVersion ()%>/bedrock.mjs";
-
-    // save the imported object to a global context for use in other script nodes
     window.Bedrock = Bedrock;
 &lt;/script>
 
+&lt;!-- other script nodes can retrieve the window global bedrock module -->
 &lt;script type="module">
     const Bedrock = window.Bedrock;
     ...

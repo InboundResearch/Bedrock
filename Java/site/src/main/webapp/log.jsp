@@ -47,32 +47,79 @@
     }
 </style>
 <script type="module">
-    const Bedrock = window.Bedrock;
+    let Bedrock = window.Bedrock;
 
     const LOG_FILE = "log-file";
     const TIMESTAMP = "timestamp";
+    const METHOD = "method";
+    const LEVEL = "level"
+    const MESSAGE = "message"
     const DATE = "date";
     const TIME = "time";
 
-    let convertTimestampRecords = function (records) {
+    let ucFirst = function (str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
+    let conditionRecords = function (records) {
         let pad = function (num, digits) {
             return num.toString ().padStart (digits, '0');
         };
 
+        let getDateFromTimestamp = function (ts) {
+            // example: 2024-12-05 19:27:48.119
+            // or: 06-Dec-2024 05:06:28.522
+            const dateRegex = /^(\d{2})-([A-Za-z]{3})-(\d{4}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})$/;
+            if (dateRegex.test(ts)) {
+                // extract components from the date string
+                const [, day, month, year, hours, minutes, seconds, milliseconds] = ts.match(dateRegex);
+
+                // map month names to their numeric equivalents (0-11)
+                const monthMap = {
+                    "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
+                    "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
+                };
+
+                // create a date object
+                return new Date(parseInt(year, 10), monthMap[month], parseInt(day, 10),
+                    parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), parseInt(milliseconds, 10));
+            } else {
+                const dateTimeString = ts.replace(" ", "T");
+                return new Date (dateTimeString);
+            }
+        };
+
+        const prefixes = ["us.irdev.", "bedrock."];
+        const levels = {"WARNING": "WARN"};
         for (let record of records) {
+            if (METHOD in record) {
+                let method = record[METHOD];
+                for (let prefix of prefixes) {
+                    if (method.startsWith(prefix)) {
+                        method = method.slice(prefix.length);
+                    }
+                }
+                record[METHOD] = method;
+            }
+            if (LEVEL in record) {
+                let level = record[LEVEL];
+                if (level in levels) {
+                    record[LEVEL] = levels[level];
+                }
+            }
             if (TIMESTAMP in record) {
-                // example: 2024-12-05 19:27:48.119
-                const dateTimeString = record[TIMESTAMP].replace(" ", "T");
-                let date = new Date (dateTimeString);
-                record[DATE] = date.getFullYear() + "-" + pad (date.getMonth() + 1, 2) + "-" +  pad (date.getDate(), 2);
-                record[TIME] = pad (date.getHours(), 2) + ":" + pad (date.getMinutes(), 2) + ":" + pad (date.getSeconds(), 2) + "." + pad (date.getMilliseconds(), 3);
-                record[TIMESTAMP] = date.getTime();
+                const date = getDateFromTimestamp(record[TIMESTAMP]);
+                if (!isNaN(date.getTime())) {
+                    record[DATE] = date.getFullYear() + "-" + pad(date.getMonth() + 1, 2) + "-" + pad(date.getDate(), 2);
+                    record[TIME] = pad(date.getHours(), 2) + ":" + pad(date.getMinutes(), 2) + ":" + pad(date.getSeconds(), 2) + "." + pad(date.getMilliseconds(), 3);
+                    record[TIMESTAMP] = date.getTime();
+                }
             }
         }
     };
 
     Bedrock.ServiceBase.post (LOG_FILE, { "line-count" : 100 }, function (records) {
-        convertTimestampRecords(records);
+        conditionRecords(records);
 
         // sort the records as an example
         let CF = Bedrock.CompareFunctions;
@@ -91,11 +138,11 @@
                     container: "bedrock-database-display",
                     records: db,
                     select: [
-                        { name: DATE, displayName: "Date", width: 0.075 },
-                        { name: TIME, displayName: "Time", width: 0.085 },
-                        { name: "level", displayName: "Level", width: 0.0625 },
-                        { name: "method", displayName: "Method", width: 0.35 },
-                        { name: "message", displayName: "Message", width: 0.4 }
+                        { name: DATE, displayName: ucFirst(DATE), width: 0.075 },
+                        { name: TIME, displayName: ucFirst(TIME), width: 0.085 },
+                        { name: LEVEL, displayName: ucFirst(LEVEL), width: 0.0625 },
+                        { name: METHOD, displayName: ucFirst(METHOD), width: 0.35 },
+                        { name: MESSAGE, displayName: ucFirst(MESSAGE), width: 0.4 }
                     ],
                     onclick: function (record) {
                         let jsonLines = JSON.stringify(record, null, 4).split ("\n");
