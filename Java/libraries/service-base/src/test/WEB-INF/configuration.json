@@ -49,6 +49,11 @@
                 "description": "Nope.",
                 "strict": false,
                 "example": {}
+            },
+            "with-exception": {
+                "description": "Exception.",
+                "strict": false,
+                "example": {}
             }
         }
     }

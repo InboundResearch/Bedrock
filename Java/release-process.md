@@ -1,7 +1,7 @@
 # Release Process
 Bedrock is currently deployed via Sonatype Nexus and the web app is built into a docker container deployed on AWS Elastic Container Service (ECS). We use a self-built container running Tomcat 10 on Open JDK 17.
 
-1) in the development branch, complete all changes, run "mvn clean install" and check in any changes. You will need to be running mongod for the database tests to succeed, and you will need to be running the debrock-1.0 container locally (localhost:8081) for the network bag tests to succeed.
+1) in the development branch, complete all changes, run "mvn clean install" and check in any changes. You will need to be running mongod for the database tests to succeed, and you will need to be running the bedrock-1.0 container locally (localhost:8081) for the network bag tests to succeed.
 2) merge the development branch changes to main (or use a pull request, which might be easier)
 3) check out the main branch
 4) make sure AWS-ECS command-line interface (CLI) tools are up-to-date.

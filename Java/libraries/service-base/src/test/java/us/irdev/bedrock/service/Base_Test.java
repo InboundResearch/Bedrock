@@ -37,19 +37,25 @@ public class Base_Test extends Base {
         event.ok ();
     }
 
+    public void handleEventWithException (Event event) {
+        BagObject bagObject = null;
+        var err = bagObject.getDouble ("param3");
+        event.ok ();
+    }
+
     private BagObject bagObjectFromPost (BagObject query) throws IOException {
         return tester.bagObjectFromPost(new BagObject (), query);
     }
 
     private void assertQuery(BagObject bagObject, BagObject query) {
-        assertEquals(bagObject.getString(STATUS), Base.OK);
+        assertEquals(Base.OK, bagObject.getString(STATUS));
         assertEquals(bagObject.getBagObject(QUERY), query);
     }
 
     @Test
     public void testAttribute () {
         assertNotNull(getContext());
-        assertSame(getAttribute(SERVLET), this);
+        assertSame(this, getAttribute(SERVLET));
     }
 
     @Test
@@ -172,5 +178,18 @@ public class Base_Test extends Base {
     public void testNope () throws IOException {
         BagObject query = BagObject.open (EVENT, "nope");
         assertEquals(ERROR, bagObjectFromPost(query).getString(STATUS));
+    }
+
+    @Test
+    public void testWithException () throws IOException {
+        BagObject query = BagObject.open (EVENT, "with-exception");
+        var response = bagObjectFromPost(query);
+        assertNotNull(response);
+        assertEquals(ERROR, response.getString(STATUS));
+        var errors = response.getBagArray (ERROR);
+        assertNotNull(errors);
+        assertEquals(1, errors.getCount ());
+        var errorString = errors.getString (0);
+        assertTrue (errorString.startsWith ("java.lang.NullPointerException"));
     }
 }
