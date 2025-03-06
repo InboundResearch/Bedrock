@@ -47,7 +47,8 @@ public class Handler {
             // event.error (exception.toString ());
         } catch (InvocationTargetException exception) {
             var cause = exception.getCause ();
-            event.error (cause.toString ());
+            // escape the error string in case it has quotes
+            event.error (Base.escapeLine (cause.toString ()));
             log.error (method.getName () + " failed", cause);
         }
     }

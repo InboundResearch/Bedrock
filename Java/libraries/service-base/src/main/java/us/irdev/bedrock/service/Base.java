@@ -421,7 +421,7 @@ public class Base extends HttpServlet {
         );
     }
 
-    protected String escapeLine (String line) {
+    public static String escapeLine (String line) {
         return line
                 .replace ("\\", "\\\\")
                 .replace ("\n", "\\n")
