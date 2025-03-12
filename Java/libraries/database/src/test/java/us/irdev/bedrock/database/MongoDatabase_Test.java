@@ -1,6 +1,7 @@
 package us.irdev.bedrock.database;
 
 import us.irdev.bedrock.bag.BagArray;
+import us.irdev.bedrock.bag.BagArrayFrom;
 import us.irdev.bedrock.bag.BagObject;
 import us.irdev.bedrock.bag.formats.MimeType;
 import us.irdev.bedrock.logger.*;
@@ -289,5 +290,29 @@ public class MongoDatabase_Test {
         BagObject configuration = BagObject.open (CONNECTION_STRING, "xxx");
         Map<String, MongoDatabase> collections = MongoDatabase.connect (configuration);
         assertEquals (null, collections);
+    }
+
+    @Test
+    public void testComplexQuery () throws Exception {
+        var historyDb = open();
+        assertNotNull (historyDb);
+        historyDb.deleteAll ();
+
+        var history = BagArrayFrom.resource (MongoDatabase_Test.class, "/history.json");
+        for (var entry : history) {
+            historyDb.put((BagObject) entry);
+        }
+
+        var query = BagObject.open(String.join (".", "query", "device-id"), "test-device-id");
+        var result = historyDb.getMany (query.toString (MimeType.JSON));
+        assertEquals (3, result.getCount ());
+
+        query = BagObject.open(String.join (".", "query", "device-id"), BagObject.open("$in", BagArray.open ("test-device-id")));
+        result = historyDb.getMany (query.toString (MimeType.JSON));
+        assertEquals (3, result.getCount ());
+
+
+        historyDb.deleteAll ();
+        historyDb.drop();
     }
 }

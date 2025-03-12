@@ -222,12 +222,17 @@ public class MongoDatabase implements Interface, AutoCloseable {
         return this;
     }
 
-    private Bson getAsString (BagObject bagObject, String key) {
+    private Bson getAsBson (BagObject bagObject, String key) {
         var value =  bagObject.getString (key);
-        if (value == null) {
-            value = bagObject.getBagObject (key).toString (MimeType.JSON);
-        }
-        return (value != null) ? Filters.eq (key, value) : null;
+        if (value != null) return Filters.eq (key, value);
+
+        var bagObjectValue = bagObject.getBagObject (key);
+        if (bagObjectValue != null) return Filters.eq (key, Document.parse (bagObjectValue.toString (MimeType.JSON)));
+
+        var bagArrayValue = bagObject.getBagArray (key);
+        if (bagArrayValue != null) return Filters.eq (key, Document.parse (bagArrayValue.toString (MimeType.JSON)));
+
+        return null;
     }
 
     private Bson buildQuery (String queryJson) {
@@ -238,16 +243,16 @@ public class MongoDatabase implements Interface, AutoCloseable {
                 if (keys.length > 1) {
                     var bsons = new ArrayList<Bson>();
                     for (var key: keys) {
-                        var filter = getAsString(queryBagObject, key);
-                        if (filter != null) {
-                            bsons.add (filter);
+                        var value = getAsBson(queryBagObject, key);
+                        if (value != null) {
+                            bsons.add(getAsBson(queryBagObject, key));
                         }
                     }
                     return Filters.and (bsons);
                 } else if (keys.length == 1) {
-                    var filter = getAsString(queryBagObject, keys[0]);
-                    if (filter != null) {
-                        return filter;
+                    var value = getAsBson(queryBagObject, keys[0]);
+                    if (value != null) {
+                        return value;
                     }
                 }
             }
