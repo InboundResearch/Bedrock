@@ -57,7 +57,7 @@ public class SelectKey {
         if (key != null) {
             switch (type) {
                 case INCLUDE:
-                    // in the include case, we can map the requested to to an "as" key
+                    // in the include case, we can map the requested to an "as" key
                     if (keys.containsKey (key)) return keys.get (key);
                     break;
                 case EXCLUDE:

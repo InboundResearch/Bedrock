@@ -13,6 +13,7 @@ import us.irdev.bedrock.logger.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -221,20 +222,33 @@ public class MongoDatabase implements Interface, AutoCloseable {
         return this;
     }
 
+    private Bson getAsString (BagObject bagObject, String key) {
+        var value =  bagObject.getString (key);
+        if (value == null) {
+            value = bagObject.getBagObject (key).toString (MimeType.JSON);
+        }
+        return (value != null) ? Filters.eq (key, value) : null;
+    }
+
     private Bson buildQuery (String queryJson) {
         if (queryJson != null) {
             var queryBagObject = BagObjectFrom.string (queryJson, MimeType.JSON);
             if (queryBagObject != null) {
-                var count = queryBagObject.getCount ();
                 var keys = queryBagObject.keys ();
-                if (count > 1) {
-                    var bsons = new Bson[count];
-                    for (int i = 0; i < count; ++i) {
-                        bsons[i] = Filters.eq (keys[i], queryBagObject.getString (keys[i]));
+                if (keys.length > 1) {
+                    var bsons = new ArrayList<Bson>();
+                    for (var key: keys) {
+                        var filter = getAsString(queryBagObject, key);
+                        if (filter != null) {
+                            bsons.add (filter);
+                        }
                     }
                     return Filters.and (bsons);
-                } else if (count == 1) {
-                    return Filters.eq (keys[0], queryBagObject.getString (keys[0]));
+                } else if (keys.length == 1) {
+                    var filter = getAsString(queryBagObject, keys[0]);
+                    if (filter != null) {
+                        return filter;
+                    }
                 }
             }
         }
