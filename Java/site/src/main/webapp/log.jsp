@@ -118,8 +118,8 @@
             if (TIMESTAMP in record) {
                 const date = getDateFromTimestamp(record[TIMESTAMP]);
                 if (!isNaN(date.getTime())) {
-                    record[DATE] = date.getFullYear() + "-" + pad(date.getMonth() + 1, 2) + "-" + pad(date.getDate(), 2);
-                    record[TIME] = pad(date.getHours(), 2) + ":" + pad(date.getMinutes(), 2) + ":" + pad(date.getSeconds(), 2) + "." + pad(date.getMilliseconds(), 3);
+                    record[DATE] = String.join ("-", date.getFullYear(), pad(date.getMonth() + 1, 2), pad(date.getDate(), 2));
+                    record[TIME] = String.join (".", String.join (":", pad(date.getHours(), 2), pad(date.getMinutes(), 2), pad(date.getSeconds(), 2)), pad(date.getMilliseconds(), 3));
                     record[TIMESTAMP] = date.getTime();
                 }
             }

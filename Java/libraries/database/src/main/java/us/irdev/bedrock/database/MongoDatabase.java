@@ -13,6 +13,7 @@ import us.irdev.bedrock.logger.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -221,20 +222,38 @@ public class MongoDatabase implements Interface, AutoCloseable {
         return this;
     }
 
+    private Bson getAsBson (BagObject bagObject, String key) {
+        var value =  bagObject.getString (key);
+        if (value != null) return Filters.eq (key, value);
+
+        var bagObjectValue = bagObject.getBagObject (key);
+        if (bagObjectValue != null) return Filters.eq (key, Document.parse (bagObjectValue.toString (MimeType.JSON)));
+
+        var bagArrayValue = bagObject.getBagArray (key);
+        if (bagArrayValue != null) return Filters.eq (key, Document.parse (bagArrayValue.toString (MimeType.JSON)));
+
+        return null;
+    }
+
     private Bson buildQuery (String queryJson) {
         if (queryJson != null) {
             var queryBagObject = BagObjectFrom.string (queryJson, MimeType.JSON);
             if (queryBagObject != null) {
-                var count = queryBagObject.getCount ();
                 var keys = queryBagObject.keys ();
-                if (count > 1) {
-                    var bsons = new Bson[count];
-                    for (int i = 0; i < count; ++i) {
-                        bsons[i] = Filters.eq (keys[i], queryBagObject.getString (keys[i]));
+                if (keys.length > 1) {
+                    var bsons = new ArrayList<Bson>();
+                    for (var key: keys) {
+                        var value = getAsBson(queryBagObject, key);
+                        if (value != null) {
+                            bsons.add(getAsBson(queryBagObject, key));
+                        }
                     }
                     return Filters.and (bsons);
-                } else if (count == 1) {
-                    return Filters.eq (keys[0], queryBagObject.getString (keys[0]));
+                } else if (keys.length == 1) {
+                    var value = getAsBson(queryBagObject, keys[0]);
+                    if (value != null) {
+                        return value;
+                    }
                 }
             }
         }

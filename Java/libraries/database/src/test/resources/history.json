@@ -1,0 +1,71 @@
+[
+  {
+    "answer": {
+      "answer": "true",
+      "expiration-timestamp": "1740526347",
+      "jurisdiction-id": 45,
+      "explanation": [
+        "Location is supplied",
+        "Location is within jurisdiction bounds",
+        "Jurisdiction includes the predicate (true)"
+      ]
+    },
+    "query": {
+      "device-id": "test-device-id",
+      "event": "query",
+      "location": {
+        "ip-address": "192.168.200.200",
+        "latitude": "31.52",
+        "longitude": "-101.24",
+        "timestamp": "1740525976"
+      },
+      "maximum-valid-period": "300"
+    }
+  },
+  {
+    "answer": {
+      "answer": "true",
+      "expiration-timestamp": "1740526216",
+      "jurisdiction-id": 45,
+      "explanation": [
+        "Location is supplied",
+        "Location is within jurisdiction bounds",
+        "Jurisdiction includes the predicate (true)"
+      ]
+    },
+    "query": {
+      "device-id": "test-device-id",
+      "event": "query",
+      "location": {
+        "ip-address": "192.168.200.200",
+        "latitude": "31.52",
+        "longitude": "-101.34",
+        "timestamp": "1740525916"
+      },
+      "maximum-valid-period": "300"
+    }
+  },
+  {
+    "answer": {
+      "answer": "true",
+      "expiration-timestamp": "1740526187",
+      "jurisdiction-id": 45,
+      "explanation": [
+        "Location is supplied",
+        "Location is within jurisdiction bounds",
+        "Jurisdiction includes the predicate (true)"
+      ]
+    },
+    "query": {
+      "device-id": "test-device-id",
+      "event": "query",
+      "location": {
+        "ip-address": "192.168.200.200",
+        "latitude": "31.52",
+        "longitude": "-101.44",
+        "timestamp": "1740525887"
+      },
+      "maximum-valid-period": "300"
+    }
+  }
+]
