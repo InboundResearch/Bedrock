@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"us.irdev.bedrock"},{"l":"us.irdev.bedrock.bag"},{"l":"us.irdev.bedrock.database"},{"l":"us.irdev.bedrock.logger"},{"l":"us.irdev.bedrock.secret"},{"l":"us.irdev.bedrock.service"},{"l":"us.irdev.bedrock.servlet.test"}];updateSearchResults();
