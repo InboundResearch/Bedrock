@@ -1,5 +1,5 @@
 <%@include file="/includes/header.jsp" %>
-<h1>Bedrock</h1>
+<h1>Locacities</h1>
 <div class="container-div">
     <h2>Server Log</h2>
     <hr>
@@ -19,7 +19,7 @@
         display: inline-block;
         font-family: sans-serif;
         text-align: left;
-        padding: 4px 0px;
+        padding: 4px 0;
         width: 100%;
         padding-top: 0;
     }
@@ -30,6 +30,9 @@
         border-width: 1px;
         border-radius: 2px;
         border-color: #bbb;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
     }
 
     div[id="bedrock-record-display"] {
@@ -67,37 +70,77 @@
         };
 
         let getDateFromTimestamp = function (ts) {
-            // example: 2024-12-05 19:27:48.119
-            // or: 2025-01-13T15:56:22.465775626Z http-nio...
-            const dateRegexNumericForm = /^(\d{4})-(0*\d+)-(0*\d+)[ T](0*\d+):(0*\d+):(0*\d+)\.(\d{3})/;
-            if (dateRegexNumericForm.test(ts)) {
-                const [, year, month, day, hours, minutes, seconds, milliseconds] = ts.match(dateRegexNumericForm);
-                // create a date object
-                return new Date(parseInt(year, 10), parseInt(month) - 1, parseInt(day, 10),
-                    parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), parseInt(milliseconds, 10));
+            if (ts == null) return new Date(NaN);
+
+            if (ts instanceof Date) return new Date(ts.getTime());
+
+            // Numbers or numeric-like strings: handle epoch in s/ms/us/ns
+            if (typeof ts === 'number' || (typeof ts === 'string' && /^\s*\d{10,19}\s*$/.test(ts))) {
+                const raw = String(ts).trim();
+                if (raw.length === 10) return new Date(Number(raw) * 1000);          // seconds
+                if (raw.length === 13) return new Date(Number(raw));                 // millis
+                if (raw.length >= 16 && raw.length <= 19) return new Date(Number(raw.slice(0, 13))); // micro/nano → ms
+                const num = Number(raw);
+                return Number.isFinite(num) ? new Date(num) : new Date(NaN);
             }
 
-            // or: 06-Dec-2024 05:06:28.522
-            const dateRegexWordForm = /^(0*\d+)-([A-Za-z]{3})-(\d{4}) (0*\d+):(0*\d+):(0*\d+)\.(\d{3})$/;
-            if (dateRegexWordForm.test(ts)) {
-                // extract components from the date string
-                const [, day, month, year, hours, minutes, seconds, milliseconds] = ts.match(dateRegexWordForm);
+            if (typeof ts !== 'string') return new Date(NaN);
+            const s = ts.trim();
 
-                // map month names to their numeric equivalents (0-11)
-                const monthMap = {
-                    "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5,
-                    "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11
-                };
-
-                // create a date object
-                return new Date(parseInt(year, 10), monthMap[month], parseInt(day, 10),
-                    parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), parseInt(milliseconds, 10));
+            // 1) ISO/RFC3339 with timezone
+            {
+                const isoLike = s.match(/^\[?(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?)(Z|[+\-]\d{2}:?\d{2}|[+\-]\d{2})/);
+                if (isoLike) {
+                    const norm = isoLike[1] + 'T' + isoLike[2] + isoLike[3];
+                    const t = Date.parse(norm);
+                    if (!Number.isNaN(t)) return new Date(t);
+                }
             }
 
-            return new Date("invalid-date-string");
+            // 2) ISO-like without timezone (local)
+            {
+                const m = s.match(/^\[?(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?/);
+                if (m) {
+                    const [, Y, Mo, D, H, Mi, S, frac = ''] = m;
+                    const ms = Number((frac + '000').slice(0, 3));
+                    return new Date(Number(Y), Number(Mo) - 1, Number(D), Number(H), Number(Mi), Number(S), ms);
+                }
+            }
+
+            // 3) 06-Dec-2024 05:06:28.522
+            {
+                const m = s.match(/^\[?(0*\d{1,2})-([A-Za-z]{3})-(\d{4}) (\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?/);
+                if (m) {
+                    const [, dStr, monStr, yStr, hStr, miStr, sStr, frac = ''] = m;
+                    const monthMap = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+                    const mon = monthMap[monStr];
+                    if (mon != null) {
+                        const ms = Number((frac + '000').slice(0, 3));
+                        return new Date(Number(yStr), mon, Number(dStr), Number(hStr), Number(miStr), Number(sStr), ms);
+                    }
+                }
+            }
+
+            // 4) Bare ISO with only date
+            {
+                const m = s.match(/^\[?(\d{4})-(\d{2})-(\d{2})(?![\d:])/);
+                if (m) {
+                    const [, Y, Mo, D] = m;
+                    return new Date(Number(Y), Number(Mo) - 1, Number(D), 0, 0, 0, 0);
+                }
+            }
+
+            // 5) Last resort
+            {
+                const normalized = s.replace(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})/, '$1T$2');
+                const t = Date.parse(normalized);
+                if (!Number.isNaN(t)) return new Date(t);
+            }
+
+            return new Date(NaN);
         };
 
-        const prefixes = ["us.irdev.", "bedrock."];
+        const prefixes = ["us.", "org.", "com.", "irdev.", "bedrock."];
         const levels = {"WARNING": "WARN"};
         for (let record of records) {
             if (METHOD in record) {
@@ -116,10 +159,14 @@
                 }
             }
             if (TIMESTAMP in record) {
+                // get the date from the record in whatever format it is in
                 const date = getDateFromTimestamp(record[TIMESTAMP]);
+
+                // if it's a valid date, replace the elements of the record with standard ones of
+                // the form YYYY-MM-DD and HH:MM:SS.mmm
                 if (!isNaN(date.getTime())) {
-                    record[DATE] = String.join ("-", date.getFullYear(), pad(date.getMonth() + 1, 2), pad(date.getDate(), 2));
-                    record[TIME] = String.join (".", String.join (":", pad(date.getHours(), 2), pad(date.getMinutes(), 2), pad(date.getSeconds(), 2)), pad(date.getMilliseconds(), 3));
+                    record[DATE] = [date.getFullYear(), pad(date.getMonth() + 1, 2), pad(date.getDate(), 2)].join('-');
+                    record[TIME] = [ [ pad(date.getHours(), 2), pad(date.getMinutes(), 2), pad(date.getSeconds(), 2) ].join(':'), pad(date.getMilliseconds(), 3) ].join('.');
                     record[TIMESTAMP] = date.getTime();
                 }
             }
