@@ -16,6 +16,7 @@
         <javascript.testDistDirectory>src/test/dist</javascript.testDistDirectory>
         <javascript.srcDistLatestDirectory>src/main/webapp/dist/latest</javascript.srcDistLatestDirectory>
             <maven.compiler.release>21</maven.compiler.release>
+            <bedrock.version>2.5.14</bedrock.version>
     </properties>
 
     <dependencyManagement>
