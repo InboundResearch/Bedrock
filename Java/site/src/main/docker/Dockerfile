@@ -1,4 +1,4 @@
-FROM tomcat:10-jre17
+FROM tomcat:10.1-jdk21-temurin
 
 # copy my war file
 COPY ROOT.war /usr/local/tomcat/webapps/
