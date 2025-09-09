@@ -23,6 +23,7 @@
               > mvn versions:display-property-updates -->
         <mongodb.version>5.2.1</mongodb.version>
         <tomcat.version>10.1.33</tomcat.version>
+        <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
 
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
@@ -292,6 +293,21 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <!-- Limit instrumentation to our code to avoid issues with JDK/internal classes -->
+                            <includes>
+                                <include>us/irdev/bedrock/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>java/**</exclude>
+                                <exclude>jdk/**</exclude>
+                                <exclude>sun/**</exclude>
+                                <exclude>javax/**</exclude>
+                                <exclude>jakarta/**</exclude>
+                                <exclude>org/junit/**</exclude>
+                            </excludes>
+                            <inclBootstrapClasses>false</inclBootstrapClasses>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>report</id>
