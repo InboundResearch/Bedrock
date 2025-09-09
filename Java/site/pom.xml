@@ -57,8 +57,9 @@
             <artifactId>servlet-tester</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- https://www.mongodb.com/docs/drivers/java/sync/v4.5/fundamentals/logging/ -->
         <!--
