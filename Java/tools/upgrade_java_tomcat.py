@@ -328,7 +328,8 @@ def main() -> int:
 
     changed_any = ch1 or ch2 or ch_enf or ch3 or ch4 or chb
 
-    if not changed_any:
+    if not changed_any and not args.apply:
+        # Dry run with no diffs to show
         print("No changes detected (files already match requested settings).")
         return 0
 
@@ -340,22 +341,25 @@ def main() -> int:
         print(df_diff)
         return 0
 
-    write_text(POM, pom_new)
-    write_text(DOCKERFILE, df_new)
-    print("Applied updates:")
-    if ch1:
-        print(f"- Set maven.compiler.release={args.java_release}")
-    if ch2:
-        print("- Ensured maven-surefire-plugin version >= 3.2.5")
-    if ch_enf:
-        print("- Ensured maven-enforcer-plugin with Java/Maven requirements")
-    if ch3:
-        print(f"- Updated parent version to {args.parent_version}")
-    if ch4:
-        print(f"- Updated Dockerfile base image to tomcat:{tomcat_tag}")
-    if chb:
-        print(f"- Set bedrock.version={args.bedrock_bom_version}")
-    # Auto-discovery flow
+    # Apply file changes if any
+    if changed_any:
+        write_text(POM, pom_new)
+        write_text(DOCKERFILE, df_new)
+        print("Applied updates:")
+        if ch1:
+            print(f"- Set maven.compiler.release={args.java_release}")
+        if ch2:
+            print("- Ensured maven-surefire-plugin version >= 3.2.5")
+        if ch_enf:
+            print("- Ensured maven-enforcer-plugin with Java/Maven requirements")
+        if ch3:
+            print(f"- Updated parent version to {args.parent_version}")
+        if ch4:
+            print(f"- Updated Dockerfile base image to tomcat:{tomcat_tag}")
+        if chb:
+            print(f"- Set bedrock.version={args.bedrock_bom_version}")
+
+    # Auto-discovery/upgrade flow: run even if no direct file edits were needed
     if args.auto:
         print("[auto] Attempting build with current settings...")
         rc = run(["mvn", "-U", "-q", "-DskipTests", "clean", "verify"])
