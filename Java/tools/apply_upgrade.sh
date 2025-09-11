@@ -28,12 +28,28 @@ if [[ -z "$branch" ]]; then
 fi
 
 echo "Applying upgrade changes on branch: $branch"
-python3 tools/upgrade_java_tomcat.py \
-  --apply \
-  --auto \
-  ${PARENT_VERSION:+--parent-version "$PARENT_VERSION"} \
-  ${BOM_VERSION:+--bedrock-bom-version "$BOM_VERSION"} \
-  ${DISCOVER:+--discover-tomcat}
+# Prefer Dockerized environment for the upgrade (python + mvn inside container)
+if command -v docker >/dev/null 2>&1; then
+  # Ensure build image exists
+  docker image inspect bedrock-build:latest >/dev/null 2>&1 || docker build -f tools/Dockerfile.build -t bedrock-build:latest .
+  DOCKER_UID="$(id -u)"; DOCKER_GID="$(id -g)"
+  docker run --rm -u "$DOCKER_UID:$DOCKER_GID" \
+    -v "$PWD":/workspace -v "$HOME/.m2":/m2 -e MAVEN_CONFIG=/m2 -w /workspace \
+    bedrock-build:latest \
+    python3 tools/upgrade_java_tomcat.py \
+      --apply \
+      --auto \
+      ${PARENT_VERSION:+--parent-version "$PARENT_VERSION"} \
+      ${BOM_VERSION:+--bedrock-bom-version "$BOM_VERSION"} \
+      ${DISCOVER:+--discover-tomcat}
+else
+  python3 tools/upgrade_java_tomcat.py \
+    --apply \
+    --auto \
+    ${PARENT_VERSION:+--parent-version "$PARENT_VERSION"} \
+    ${BOM_VERSION:+--bedrock-bom-version "$BOM_VERSION"} \
+    ${DISCOVER:+--discover-tomcat}
+fi
 
 echo "Staging changes"
 # Determine paths (top-level module or 'site' submodule)
@@ -48,7 +64,15 @@ git commit -m "chore: auto-upgrade Java/Tomcat${BOM_VERSION:+; set bedrock.versi
 
 if [[ $RUN_TESTS -eq 1 ]]; then
   echo "Running build and tests"
-  mvn -q -e -DskipTests=false clean test
+  if command -v docker >/dev/null 2>&1; then
+    DOCKER_UID="$(id -u)"; DOCKER_GID="$(id -g)"
+    docker run --rm -u "$DOCKER_UID:$DOCKER_GID" \
+      -v "$PWD":/workspace -v "$HOME/.m2":/m2 -e MAVEN_CONFIG=/m2 -w /workspace \
+      bedrock-build:latest \
+      mvn -q -e -Dmaven.repo.local=/m2/repository -DskipTests=false clean test
+  else
+    mvn -q -e -DskipTests=false clean test
+  fi
 fi
 
 if [[ $OPEN_PR -eq 1 ]]; then

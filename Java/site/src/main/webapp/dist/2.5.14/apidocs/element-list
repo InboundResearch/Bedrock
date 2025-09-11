@@ -7,17 +7,12 @@ us.irdev.bedrock.bag.expr
 us.irdev.bedrock.bag.formats
 us.irdev.bedrock.bag.scanner
 module:us.irdev.bedrock.database
-us.irdev.bedrock
 us.irdev.bedrock.database
 module:us.irdev.bedrock.logger
-us.irdev.bedrock
 us.irdev.bedrock.logger
 module:us.irdev.bedrock.secret
-us.irdev.bedrock
 us.irdev.bedrock.secret
 module:us.irdev.bedrock.service
-us.irdev.bedrock
 us.irdev.bedrock.service
 module:us.irdev.bedrock.servlet.test
-us.irdev.bedrock
 us.irdev.bedrock.servlet.test

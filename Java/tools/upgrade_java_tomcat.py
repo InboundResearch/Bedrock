@@ -30,15 +30,14 @@ import urllib.request
 import urllib.error
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-# Resolve target module: prefer current ROOT if it has Dockerfile, else try known module 'site'
-ROOT_TARGET = ROOT
-if not (ROOT / "src/main/docker/Dockerfile").exists():
-    candidate = ROOT / "site"
-    if (candidate / "src/main/docker/Dockerfile").exists():
-        ROOT_TARGET = candidate
-
-POM = ROOT_TARGET / "pom.xml"
-DOCKERFILE = ROOT_TARGET / "src/main/docker/Dockerfile"
+# Always operate on the root POM for build-wide settings
+POM_ROOT = ROOT / "pom.xml"
+# Resolve a module Dockerfile to update Tomcat base image: prefer root, else 'site'
+DOCKERFILE = ROOT / "src/main/docker/Dockerfile"
+if not DOCKERFILE.exists():
+    candidate = ROOT / "site" / "src/main/docker/Dockerfile"
+    if candidate.exists():
+        DOCKERFILE = candidate
 
 
 def read_text(p: pathlib.Path) -> str:
@@ -258,18 +257,19 @@ def main() -> int:
     parser.add_argument("--discover-tomcat", action="store_true", help="Discover latest stable tomcat tag (requires network)")
     args = parser.parse_args()
 
-    if not POM.exists():
-        print(f"ERROR: pom.xml not found at {POM}", file=sys.stderr)
+    if not POM_ROOT.exists():
+        print(f"ERROR: pom.xml not found at {POM_ROOT}", file=sys.stderr)
         return 2
     if not DOCKERFILE.exists():
         print(f"ERROR: Dockerfile not found at {DOCKERFILE}", file=sys.stderr)
         return 2
 
-    pom_old = read_text(POM)
+    pom_old = read_text(POM_ROOT)
     df_old = read_text(DOCKERFILE)
     changed_any = False
 
-    pom_new, ch1 = ensure_property(pom_old, "maven.compiler.release", args.java_release)
+    # Align root build: set java.version, ensure surefire/enforcer
+    pom_new, ch1 = ensure_property(pom_old, "java.version", args.java_release)
     pom_new, ch2 = ensure_surefire(pom_new)
     pom_new, ch_enf = ensure_enforcer(pom_new, args.java_release)
     pom_new, ch3 = maybe_update_parent(pom_new, args.parent_version)
@@ -333,7 +333,7 @@ def main() -> int:
         print("No changes detected (files already match requested settings).")
         return 0
 
-    pom_diff = diff_str(pom_old, pom_new, str(POM))
+    pom_diff = diff_str(pom_old, pom_new, str(POM_ROOT))
     df_diff = diff_str(df_old, df_new, str(DOCKERFILE))
 
     if not args.apply:
@@ -343,7 +343,7 @@ def main() -> int:
 
     # Apply file changes if any
     if changed_any:
-        write_text(POM, pom_new)
+        write_text(POM_ROOT, pom_new)
         write_text(DOCKERFILE, df_new)
         print("Applied updates:")
         if ch1:

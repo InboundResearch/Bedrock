@@ -6,19 +6,22 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 public class FromUrlTest {
+    private static String baseUrl() {
+        return System.getProperty("TEST_SERVER_BASE_URL", "http://localhost:8081");
+    }
     @Test
     public void testGet () throws IOException {
-        BagObject ipAddress = BagObjectFrom.url ("http://localhost:8081/api?event=ip-address", () -> null);
+        BagObject ipAddress = BagObjectFrom.url (baseUrl() + "/api?event=ip-address", () -> null);
         BagTest.report (ipAddress.getString ("response/ip-address") != null, true, "Got a valid BagObject");
 
         // XXX should add an array processor to the test API for when github throttles the API
-        BagArray arrayEcho = BagArrayFrom.url ("http://localhost:8081/api?event=echo-array", () -> null);
+        BagArray arrayEcho = BagArrayFrom.url (baseUrl() + "/api?event=echo-array", () -> null);
         BagTest.report (arrayEcho.getCount () > 0, true, "Got a valid BagArray");
     }
 
     @Test
     public void testPost () throws IOException {
-        BagObject postResponseBagObject = BagObjectFrom.url ("http://localhost:8081/api?event=echo",
+        BagObject postResponseBagObject = BagObjectFrom.url (baseUrl() + "/api?event=echo",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -28,7 +31,7 @@ public class FromUrlTest {
         );
         BagTest.report (postResponseBagObject.getString ("post-data/login"), "brettonw", "Got a valid BagObject - 1");
 
-        postResponseBagObject = BagObjectFrom.url ("http://localhost:8081/api?event=echo",
+        postResponseBagObject = BagObjectFrom.url (baseUrl() + "/api?event=echo",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -37,7 +40,7 @@ public class FromUrlTest {
         );
         BagTest.report (postResponseBagObject.getString ("post-data/login"), "brettonw", "Got a valid BagObject - 2");
 
-        BagArray postResponseBagArray = BagArrayFrom.url ("http://localhost:8081/api?event=echo-post",
+        BagArray postResponseBagArray = BagArrayFrom.url (baseUrl() + "/api?event=echo-post",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -49,7 +52,7 @@ public class FromUrlTest {
         );
         BagTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
 
-        postResponseBagArray = BagArrayFrom.url ("http://localhost:8081/api?event=echo-post",
+        postResponseBagArray = BagArrayFrom.url (baseUrl() + "/api?event=echo-post",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
