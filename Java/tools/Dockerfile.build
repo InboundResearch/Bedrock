@@ -1,0 +1,22 @@
+FROM maven:3.9-eclipse-temurin-21
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       build-essential \
+       gcc \
+       git \
+       curl \
+       ca-certificates \
+       python3 \
+       gnupg \
+       socat \
+       nodejs \
+       npm \
+    && npm install -g uglify-js \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+CMD ["bash"]

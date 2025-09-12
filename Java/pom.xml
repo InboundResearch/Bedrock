@@ -16,13 +16,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- project static versions -->
-        <maven-minimum.version>3.9.0</maven-minimum.version>
-        <java.version>17</java.version>
+        <maven-minimum.version>3.9.6</maven-minimum.version>
+        <java.version>21</java.version>
+        <!-- default: skip GPG when building snapshots or when -Dgpg.skip=true is provided -->
+        <gpg.skip>${is.snapshot}</gpg.skip>
 
         <!-- dependency versions - get a report on updates with
               > mvn versions:display-property-updates -->
         <mongodb.version>5.2.1</mongodb.version>
         <tomcat.version>10.1.33</tomcat.version>
+        <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
 
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
@@ -292,6 +295,21 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <!-- Limit instrumentation to our code to avoid issues with JDK/internal classes -->
+                            <includes>
+                                <include>us/irdev/bedrock/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>java/**</exclude>
+                                <exclude>jdk/**</exclude>
+                                <exclude>sun/**</exclude>
+                                <exclude>javax/**</exclude>
+                                <exclude>jakarta/**</exclude>
+                                <exclude>org/junit/**</exclude>
+                            </excludes>
+                            <inclBootstrapClasses>false</inclBootstrapClasses>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>report</id>
@@ -371,8 +389,8 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <!-- skip when version is SNAPSHOT -->
-                            <skip>${is.snapshot}</skip>
+                            <!-- skip based on property (defaults to SNAPSHOT builds) and can be overridden via -Dgpg.skip=true -->
+                            <skip>${gpg.skip}</skip>
                         </configuration>
                     </execution>
                 </executions>

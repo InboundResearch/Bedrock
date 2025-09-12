@@ -106,7 +106,8 @@ public class FormatReaderXmlTest {
 
     @Test
     public void testFormatReaderXmlWithHtmlFromUrl () {
-        confirmHtmlDoc(BagArrayFrom.url("http://localhost:8081"));
+        var baseUrl = System.getProperty("TEST_SERVER_BASE_URL", "http://localhost:8081");
+        confirmHtmlDoc(BagArrayFrom.url(baseUrl));
     }
 
     @Test
